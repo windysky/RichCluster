@@ -22,3 +22,14 @@ RoxygenNote: 7.3.2
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+Collate: 
+    'RcppExports.R'
+    'all_clusters_hmap.R'
+    'cluster_correlation.R'
+    'filter_merged_seeds.R'
+    'full_network.R'
+    'load_all.R'
+    'merge_richsets.R'
+    'package.R'
+    'run_shiny_app.R'
+    'zzz.R'

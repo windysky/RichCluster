@@ -108,7 +108,7 @@ cluster_network <- function(final_clusters, distance_matrix, cluster_number) {
   })
 
   # Create the networkD3 plot
-  d3net <- forceNetwork(
+  d3net <-  networkD3::forceNetwork(
     Links = g_d3$links,
     Nodes = g_d3$nodes,
     Source = "source",

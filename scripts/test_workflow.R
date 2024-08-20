@@ -11,11 +11,13 @@ load_cluster_data <- function(from_scratch=FALSE)
   }
   else {
     # Read the data files
-    rr1 <- read.delim(system.file("extdata", "go1.txt", package="RichCluster"))
-    rr2 <- read.delim(system.file("extdata", "go2.txt", package="RichCluster"))
+    # rr1 <- read.delim(system.file("extdata", "go1.txt", package="RichCluster"))
+    # rr2 <- read.delim(system.file("extdata", "go2.txt", package="RichCluster"))
+    rr1 <- read.csv(system.file("extdata", "7mo_DEG.csv", package="RichCluster"))
+    rr2 <- read.csv(system.file("extdata", "7mo_DMR.csv", package="RichCluster"))
 
     richsets <- list(rr1, rr2)
-    richnames <- c('go1', 'go2')
+    richnames <- c('7mo_DEG', '7mo_DMR')
 
     merged_richsets <- RichCluster::merge_richsets(richsets)
 
@@ -24,8 +26,8 @@ load_cluster_data <- function(from_scratch=FALSE)
     padj_vec <- merged_richsets$Padj
 
     cluster_result <- RichCluster::RichCluster(
-      "kappa", 0.5,
-      "DAVID", 0.5,
+      "kappa", 0.8,
+      "DAVID", 0.8,
       term_vec,
       geneID_vec,
       padj_vec
@@ -56,22 +58,24 @@ test_workflow <- function(cluster_result, min_terms=5) {
   }
 
   # Testing: Choose one to comment out and test
-  # all_hmap <- RichCluster::all_clusters_hmap(full_clusterdf, "Padj")
-  # cluster_correlation_hmap <- RichCluster::cluster_correlation_hmap(final_clusters, distance_matrix, 1)
-  # cluster_network <- RichCluster::cluster_network(final_clusters, distance_matrix, 1)
-  full_network <- RichCluster::full_network(distance_matrix[1:30, 1:30])
-  return(full_network)
+  result <- RichCluster::all_clusters_hmap(full_clusterdf, "Padj")
+  # result <- RichCluster::cluster_correlation_hmap(final_clusters, distance_matrix, 3)
+  # result <- RichCluster::cluster_network(final_clusters, distance_matrix, 1)
+  # result <- RichCluster::full_network(distance_matrix[1:30, 1:30])
+  return(result)
 }
 
 # cluster_result <- load_cluster_data(from_scratch=TRUE)
 cluster_result <- load_cluster_data(from_scratch=FALSE)
 
-all_hmap_5 <- test_workflow(cluster_result, 5)
+all_hmap_5 <- test_workflow(cluster_result, 3)
 all_hmap_5
 
 all_hmap_10 <- test_workflow(cluster_result, 10)
 all_hmap_10
 
+rr1 <- read.csv(system.file("extdata", "7mo_DEG.csv", package="RichCluster"))
+rr2 <- read.csv(system.file("extdata", "7mo_DMR.csv", package="RichCluster"))
 
 
 

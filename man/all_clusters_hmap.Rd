@@ -4,12 +4,21 @@
 \alias{all_clusters_hmap}
 \title{Create a Heatmap for All Clusters}
 \usage{
-all_clusters_hmap(full_clusterdf, value_type = "Padj")
+all_clusters_hmap(
+  full_clusterdf,
+  value_type = "Padj",
+  x_labels = NULL,
+  title = NULL
+)
 }
 \arguments{
 \item{full_clusterdf}{A dataframe containing the full cluster data.}
 
 \item{value_type}{A string specifying the type of value to use for the heatmap (default is "Padj").}
+
+\item{x_labels}{A vector of strings specifying the labels for the x-axis (default is NULL, which uses the original column names).}
+
+\item{title}{A string specifying the title of the heatmap (default is NULL, which generates a default title).}
 }
 \value{
 An interactive heatmaply heatmap.

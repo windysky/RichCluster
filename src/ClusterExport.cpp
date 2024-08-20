@@ -4,10 +4,10 @@
 #include "MergeStrategy.h"
 #include <string>
 
-//' RichCluster
-//' 
-//' This function clusters terms within an enrichment result with based on gene 
-//' similarity using specified distance metrics and merging strategies. It 
+//' @name RichCluster
+//'
+//' This function clusters terms within an enrichment result with based on gene
+//' similarity using specified distance metrics and merging strategies. It
 //' integrates the following steps:
 //' \enumerate{
 //'   \item{Initializes a ClusterManager with input gene data.}
@@ -52,7 +52,7 @@ Rcpp::List RichCluster(std::string distanceMetric, double distanceCutoff,
   DistanceMetric DM(distanceMetric, distanceCutoff);
 
   CM.calculateDistanceScores(DM);
-  
+
   /* MergeStrategy requires the following parameters:
       std::string mergeStrategy, (ex: "DAVID")
       double mergeCutoff, (0-1)
@@ -69,4 +69,29 @@ Rcpp::List RichCluster(std::string distanceMetric, double distanceCutoff,
     Rcpp::_["FilteredSeeds"] = FilteredSeedMap,
     Rcpp::_["MergedSeeds"] = CM.exportR_ClusterList()
   );
+}
+
+//' @name ComputeDistanceMatrix
+//'
+//' This function computes a distance matrix based on gene similarity using a specified distance metric.
+//'
+//' @param distanceMetric A string specifying the distance metric to use (e.g., "kappa").
+//' @param distanceCutoff A double specifying the distance cutoff value.
+//' @param termNameColumn A CharacterVector containing term names.
+//' @param geneIDColumn A CharacterVector containing gene IDs.
+//' @param PvalueColumn A NumericVector containing p-values.
+//'
+//' @return A NumericMatrix containing the distance matrix.
+//'
+//' @export
+// [[Rcpp::export]]
+Rcpp::NumericMatrix ComputeDistanceMatrix(std::string distanceMetric, double distanceCutoff,
+                                          Rcpp::CharacterVector termNameColumn,
+                                          Rcpp::CharacterVector geneIDColumn,
+                                          Rcpp::NumericVector PvalueColumn) {
+  ClusterManager CM(termNameColumn, geneIDColumn, PvalueColumn);
+  DistanceMetric DM(distanceMetric, distanceCutoff);
+
+  CM.calculateDistanceScores(DM);
+  return CM.exportR_DistanceMatrix();
 }

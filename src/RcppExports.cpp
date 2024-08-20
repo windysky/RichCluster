@@ -27,9 +27,25 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// ComputeDistanceMatrix
+Rcpp::NumericMatrix ComputeDistanceMatrix(std::string distanceMetric, double distanceCutoff, Rcpp::CharacterVector termNameColumn, Rcpp::CharacterVector geneIDColumn, Rcpp::NumericVector PvalueColumn);
+RcppExport SEXP _RichCluster_ComputeDistanceMatrix(SEXP distanceMetricSEXP, SEXP distanceCutoffSEXP, SEXP termNameColumnSEXP, SEXP geneIDColumnSEXP, SEXP PvalueColumnSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type distanceMetric(distanceMetricSEXP);
+    Rcpp::traits::input_parameter< double >::type distanceCutoff(distanceCutoffSEXP);
+    Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type termNameColumn(termNameColumnSEXP);
+    Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type geneIDColumn(geneIDColumnSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type PvalueColumn(PvalueColumnSEXP);
+    rcpp_result_gen = Rcpp::wrap(ComputeDistanceMatrix(distanceMetric, distanceCutoff, termNameColumn, geneIDColumn, PvalueColumn));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_RichCluster_RichCluster", (DL_FUNC) &_RichCluster_RichCluster, 7},
+    {"_RichCluster_ComputeDistanceMatrix", (DL_FUNC) &_RichCluster_ComputeDistanceMatrix, 5},
     {NULL, NULL, 0}
 };
 

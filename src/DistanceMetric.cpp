@@ -3,6 +3,8 @@
 double DistanceMetric::calculateDistance(const std::unordered_set<std::string>& t1_genes, const std::unordered_set<std::string>& t2_genes, double totalGeneCount) {
   if (_distanceMetric == "kappa") {
     return getKappa(t1_genes, t2_genes, totalGeneCount);
+  } else if (_distanceMetric == "jaccard") {
+    return getJaccard(t1_genes, t2_genes);
   } else {
     throw std::invalid_argument("Unsupported distance metric: " + _distanceMetric);
   }
@@ -42,3 +44,13 @@ double DistanceMetric::calculateDistance(const std::unordered_set<std::string>& 
      return (relative_observed_agree - chance_agree) / (1 - chance_agree); // Return kappa!
    }
  }
+
+double DistanceMetric::getJaccard(const std::unordered_set<std::string>& t1_genes, const std::unordered_set<std::string>& t2_genes){
+  std::unordered_set<std::string> intersection;
+  std::set_intersection(t1_genes.begin(), t1_genes.end(), t2_genes.begin(), t2_genes.end(), std::inserter(intersection, intersection.begin()));
+
+  double common = static_cast<double>(intersection.size()); // Number of common genes
+  double total = static_cast<double>(t1_genes.size()) + static_cast<double>(t2_genes.size());
+
+  return common / total;
+}

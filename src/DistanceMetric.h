@@ -33,7 +33,7 @@ private:
 
   // Types of supported distance metrics
   double getKappa(const std::unordered_set<std::string>& t1_genes, const std::unordered_set<std::string>& t2_genes, double totalGeneCount);
-  // double getJaccard();
+  double getJaccard(const std::unordered_set<std::string>& t1_genes, const std::unordered_set<std::string>& t2_genes);
   // double getCosineSimilarity();
 
   void updateDistanceFunction();

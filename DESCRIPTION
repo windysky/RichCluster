@@ -3,7 +3,7 @@ Type: Package
 Title: What the Package Does (Title Case)
 Version: 0.1.0
 Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
+Maintainer: Sarah Hong <ssh2198@columbia.edu>
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
 License: What license is it under?
@@ -25,11 +25,12 @@ Config/testthat/edition: 3
 Collate: 
     'RcppExports.R'
     'all_clusters_hmap.R'
+    'cluster.R'
     'cluster_correlation.R'
     'filter_merged_seeds.R'
     'full_network.R'
     'load_all.R'
-    'merge_richsets.R'
+    'merge_enrichment_results.R'
     'package.R'
     'run_shiny_app.R'
     'zzz.R'

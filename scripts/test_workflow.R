@@ -19,24 +19,22 @@ load_cluster_data <- function(from_scratch=FALSE)
     richsets <- list(rr1, rr2)
     richnames <- c('7mo_DEG', '7mo_DMR')
 
-    merged_richsets <- RichCluster::merge_richsets(richsets)
+    # merged_richsets <- RichCluster::merge_richsets(richsets)
+    #
+    # term_vec <- merged_richsets$Term
+    # geneID_vec <- merged_richsets$GeneID
+    # padj_vec <- merged_richsets$Padj
 
-    term_vec <- merged_richsets$Term
-    geneID_vec <- merged_richsets$GeneID
-    padj_vec <- merged_richsets$Padj
-
-    cluster_result <- RichCluster::RichCluster(
+    cluster_result <- RichCluster::cluster(
+      richsets, richnames,
       "kappa", 0.8,
-      "DAVID", 0.8,
-      term_vec,
-      geneID_vec,
-      padj_vec
+      "DAVID", 0.8
     )
 
     # Save cluster results to CSV for faster future testing
     dist_matrix_df <- as.data.frame(cluster_result$DistanceMatrix)
     write.csv(dist_matrix_df, "inst/extdata/distance_matrix.csv", row.names=TRUE)
-    write.csv(cluster_result$MergedSeeds, "inst/extdata/merged_seeds.csv", row.names=FALSE)
+    write.csv(cluster_result$Clusters, "inst/extdata/clusters.csv", row.names=FALSE)
 
   }
   return(cluster_result)
@@ -65,17 +63,11 @@ test_workflow <- function(cluster_result, min_terms=5) {
   return(result)
 }
 
-# cluster_result <- load_cluster_data(from_scratch=TRUE)
-cluster_result <- load_cluster_data(from_scratch=FALSE)
+cluster_result <- load_cluster_data(from_scratch=TRUE)
+# cluster_result <- load_cluster_data(from_scratch=FALSE)
 
 all_hmap_5 <- test_workflow(cluster_result, 3)
 all_hmap_5
 
 all_hmap_10 <- test_workflow(cluster_result, 10)
 all_hmap_10
-
-rr1 <- read.csv(system.file("extdata", "7mo_DEG.csv", package="RichCluster"))
-rr2 <- read.csv(system.file("extdata", "7mo_DMR.csv", package="RichCluster"))
-
-
-

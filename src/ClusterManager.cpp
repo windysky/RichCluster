@@ -14,9 +14,9 @@ ClusterManager::ClusterManager(Rcpp::CharacterVector termNameColumn,
   : _termNames(Rcpp::as<std::vector<std::string>>(termNameColumn)),
     _geneIDstrings(Rcpp::as<std::vector<std::string>>(geneIDColumn)),
     _Pvalues(Rcpp::as<std::vector<double>>(PvalueColumn)),
-    _nterms(_termNames.size()), 
-    distanceMatrix(_nterms, _termNames), 
-    seedMap(&_termNames, &_geneIDstrings, &_Pvalues), 
+    _nterms(_termNames.size()),
+    distanceMatrix(_nterms, _termNames),
+    seedMap(&_termNames, &_geneIDstrings, &_Pvalues),
     clusterList(seedMap, distanceMatrix) // fix later
 {
   // Ensure all vectors are of the same size
@@ -47,15 +47,16 @@ void ClusterManager::calculateDistanceScores(DistanceMetric distanceMetric) {
         double distanceScore = distanceMetric.calculateDistance(term1_genes, term2_genes, totalGeneCount);
         distanceMatrix.setDistance(distanceScore, i, j);
 
+        // if two terms are MORE similar than our designated cutoff
         if (distanceScore >= distanceMetric.getDistanceCutoff()) {
-          seedMap.addTermPair(i, j);
+          seedMap.addTermPair(i, j); // add to seedmap
 
           // Print distance score information
-          std::cout << distanceMetric.getDistanceMethod() << " for (" << _termNames[i] << ", ";
-          std::cout << _termNames[j] << "): " << distanceScore << std::endl;
-
-          std::cout << _termNames[i] << " genes: " << _geneIDstrings[i] << ", ";
-          std::cout <<  _termNames[j] << " genes: " << _geneIDstrings[j] << std::endl;
+          // std::cout << distanceMetric.getDistanceMethod() << " for (" << _termNames[i] << ", ";
+          // std::cout << _termNames[j] << "): " << distanceScore << std::endl;
+          //
+          // std::cout << _termNames[i] << " genes: " << _geneIDstrings[i] << ", ";
+          // std::cout <<  _termNames[j] << " genes: " << _geneIDstrings[j] << std::endl;
         }
       }
     }

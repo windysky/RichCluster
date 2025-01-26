@@ -30,7 +30,7 @@
 #' result <- cluster(enrichment_results, distance_metric = "kappa", distance_cutoff = 0.5)
 #' print(result$DistanceMatrix)
 #' @export
-cluster <- function(enrichment_results, df_names=NULL,
+cluster <- function(enrichment_results, df_names=NULL, min_terms=5,
                     distance_metric="kappa", distance_cutoff=0.5,
                     merge_strategy="DAVID", membership_cutoff=0.5) {
 
@@ -74,6 +74,9 @@ cluster <- function(enrichment_results, df_names=NULL,
   cluster_result$cluster_options <- cluster_options
   cluster_result$df_names <- df_names
 
+  cluster_result$final_clusters <- filter_clusters(cluster_result$all_clusters, min_terms)
+  cluster_result$cluster_df <- make_full_clusterdf(cluster_result$final_clusters, merged_df)
+
   return(cluster_result)
 }
 
@@ -101,3 +104,55 @@ validate_inputs <- function(enrichment_results, df_names=NA_character_,
   }
 
 }
+
+#' Filter Clusters by Number of Terms
+#'
+#' Filters the full list of clusters by keeping only those with greater
+#' than or equal to min_terms # of terms.
+#'
+#' @param full_clusters A dataframe containing the merged seeds with column named `ClusterIndices`.
+#' @param min_terms An integer specifying the minimum number of terms required in a cluster.
+#'
+#' @return The filtered data frame with clusters filtered to include only those with at least `min_terms` terms.
+#'
+#' @export
+filter_clusters <- function(all_clusters, min_terms)
+{
+  filtered_clusters <- all_clusters %>%
+    mutate(row_id = row_number()) %>%  # Add a row identifier
+    separate_rows(TermIndices, sep = ", ") %>%  # Separate into individual rows
+    group_by(row_id, Cluster) %>%  # Group by the original rows
+    dplyr::filter(n() >= min_terms) %>%  # Filter groups with at least X terms
+    summarise(TermIndices = paste(TermIndices, collapse = ", ")) %>%  # Collapse back to single strings
+    ungroup() %>%  # Ungroup to finalize the data frame
+    select(-row_id)  # Remove the temporary row identifier
+
+  return(filtered_clusters)
+}
+
+
+make_full_clusterdf <- function(final_clusters, merged_df) {
+  # Initialize an empty data frame to store the results
+  full_clusterdf <- data.frame()
+
+  # Loop over each row in final_clusters
+  for(i in seq_len(nrow(final_clusters))) {
+    row <- final_clusters[i, ]
+    TermIndices <- unlist(strsplit(row$TermIndices, ", "))
+
+    # Loop over each term index in TermIndices
+    for (termIndex in TermIndices) {
+      R_termIndex <- as.integer(termIndex) + 1  # Convert termIndex to integer and adjust for 1-based indexing
+      term_row <- merged_df[R_termIndex, ]  # Get the row corresponding to the termIndex
+
+      # Create a new row with the cluster number and term row
+      new_row <- c(Cluster = i, term_row)
+
+      # Append the new row to the data frame
+      full_clusterdf <- rbind(full_clusterdf, new_row)
+    }
+  }
+
+  return(full_clusterdf)
+}
+

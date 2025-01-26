@@ -35,10 +35,8 @@
 //' @examples
 //' # Example usage
 //' result <- RichCluster("kappa", 0.5, "DAVID", 0.7, termNames, geneIDs, pValues)
-//' distanceMatrix <- result$DistanceMatrix
-//' seedMap <- result$SeedMap
-//' filteredSeeds <- result$FilteredSeeds
-//' mergedSeeds <- result$MergedSeeds
+//' distanceMatrix <- result$distance_matrix
+//' all_clusters <- result$all_clusters
 //'
 //' @export
 // [[Rcpp::export]]
@@ -70,8 +68,8 @@ Rcpp::List RichCluster(std::string distanceMetric, double distanceCutoff,
   //   Rcpp::_["MergedSeeds"] = CM.exportR_ClusterList()
   // );
   return Rcpp::List::create(
-    Rcpp::_["DistanceMatrix"] = CM.exportR_DistanceMatrix(),
-    Rcpp::_["Clusters"] = CM.exportR_ClusterList()
+    Rcpp::_["distance_matrix"] = CM.exportR_DistanceMatrix(),
+    Rcpp::_["all_clusters"] = CM.exportR_ClusterList()
   );
 }
 

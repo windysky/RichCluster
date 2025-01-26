@@ -32,9 +32,9 @@ load_cluster_data <- function(from_scratch=FALSE)
     )
 
     # Save cluster results to CSV for faster future testing
-    dist_matrix_df <- as.data.frame(cluster_result$DistanceMatrix)
+    dist_matrix_df <- as.data.frame(cluster_result$distance_matrix)
     write.csv(dist_matrix_df, "inst/extdata/distance_matrix.csv", row.names=TRUE)
-    write.csv(cluster_result$Clusters, "inst/extdata/clusters.csv", row.names=FALSE)
+    write.csv(cluster_result$all_clusters, "inst/extdata/clusters.csv", row.names=FALSE)
 
   }
   return(cluster_result)
@@ -43,10 +43,10 @@ load_cluster_data <- function(from_scratch=FALSE)
 # Example of what workflow using the functions looks like
 test_workflow <- function(cluster_result, min_terms=5) {
   # Unpack distance_matrix and merged_seeds from list
-  distance_matrix <- cluster_result$DistanceMatrix
-  merged_seeds <- cluster_result$MergedSeeds
+  distance_matrix <- cluster_result$distance_matrix
+  all_clusters <- cluster_result$all_clusters
 
-  final_clusters <- RichCluster::filter_merged_seeds(merged_seeds, min_terms)
+  final_clusters <- RichCluster::filter_merged_seeds(cluster_result$all_clusters, 3)
   full_clusterdf <- RichCluster::make_full_clusterdf(final_clusters, merged_richsets)
 
   if (FALSE) {

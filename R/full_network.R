@@ -2,10 +2,11 @@
 #'
 #' This function generates a network graph for the entire distance matrix.
 #'
-#' @param distance_matrix A matrix representing the distances between terms.
+#' @param cluster_result Cluster result named list from RichCluster::cluster()
 #' @return An interactive networkD3 network graph.
 #' @export
-full_network <- function(distance_matrix) {
+full_network <- function(cluster_result) {
+  distance_matrix = cluster_result$distance_matrix
   # Create an igraph object from the distance matrix
   g <- igraph::graph_from_adjacency_matrix(distance_matrix, mode="undirected", weighted=TRUE)
   term_names <- rownames(distance_matrix)

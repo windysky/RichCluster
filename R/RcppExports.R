@@ -32,10 +32,8 @@
 #' @examples
 #' # Example usage
 #' result <- RichCluster("kappa", 0.5, "DAVID", 0.7, termNames, geneIDs, pValues)
-#' distanceMatrix <- result$DistanceMatrix
-#' seedMap <- result$SeedMap
-#' filteredSeeds <- result$FilteredSeeds
-#' mergedSeeds <- result$MergedSeeds
+#' distanceMatrix <- result$distance_matrix
+#' all_clusters <- result$all_clusters
 #'
 #' @export
 RichCluster <- function(distanceMetric, distanceCutoff, mergeStrategy, membershipCutoff, termNameColumn, geneIDColumn, PvalueColumn) {

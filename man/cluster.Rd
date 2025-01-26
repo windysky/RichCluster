@@ -7,6 +7,7 @@
 cluster(
   enrichment_results,
   df_names = NULL,
+  min_terms = 5,
   distance_metric = "kappa",
   distance_cutoff = 0.5,
   merge_strategy = "DAVID",

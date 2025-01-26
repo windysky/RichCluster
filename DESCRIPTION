@@ -4,8 +4,8 @@ Title: What the Package Does (Title Case)
 Version: 0.1.0
 Author: Who wrote it
 Maintainer: Sarah Hong <ssh2198@columbia.edu>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Description: Customizable C++ algorithm for hierarchical agglomerative clustering of biological terms 
+    by gene similarity (kappa/jaccard), with supporting visualizations for easy use.
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
@@ -27,7 +27,6 @@ Collate:
     'all_clusters_hmap.R'
     'cluster.R'
     'cluster_correlation.R'
-    'filter_merged_seeds.R'
     'full_network.R'
     'load_all.R'
     'merge_enrichment_results.R'

@@ -4,7 +4,7 @@
 \alias{full_network}
 \title{Create a Network Graph for the Entire Distance Matrix}
 \usage{
-full_network(distance_matrix)
+full_network(cluster_result)
 }
 \arguments{
 \item{distance_matrix}{A matrix representing the distances between terms.}

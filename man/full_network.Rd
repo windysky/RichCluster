@@ -7,7 +7,7 @@
 full_network(cluster_result)
 }
 \arguments{
-\item{distance_matrix}{A matrix representing the distances between terms.}
+\item{cluster_result}{Cluster result named list from RichCluster::cluster()}
 }
 \value{
 An interactive networkD3 network graph.

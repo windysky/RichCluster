@@ -15,8 +15,8 @@
 #' @param membership_cutoff A numeric value between 0 and 1 for the membership cutoff.
 #'
 #' @return A named list containing:
-#'         - `DistanceMatrix`: The distance matrix used in clustering.
-#'         - `Clusters`: The final clusters.
+#'         - `distance_matrix`: The distance matrix used in clustering.
+#'         - `clusters`: The final clusters.
 #'         - `df_list`: The original list of enrichment result dataframes.
 #'         - `merged_df`: The merged dataframe containing combined results.
 #'         - `cluster_options`: A list of clustering parameters used in the analysis.
@@ -28,7 +28,7 @@
 #'   df2 = data.frame(Term = c("A", "C"), GeneID = c("gene3", "gene4"), Padj = c(0.03, 0.04))
 #' )
 #' result <- cluster(enrichment_results, distance_metric = "kappa", distance_cutoff = 0.5)
-#' print(result$DistanceMatrix)
+#' print(result$distance_matrix)
 #' @export
 cluster <- function(enrichment_results, df_names=NULL, min_terms=5,
                     distance_metric="kappa", distance_cutoff=0.5,

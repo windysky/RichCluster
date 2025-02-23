@@ -41,6 +41,7 @@ all_clusters_hmap <- function(full_clusterdf, value_type = "Padj", x_labels = NU
   heatmap_data <- summary_data %>%
     select(Cluster, all_of(value_cols))
 
+  # REPRESENTATIVE TERM FINDING
   # Find the term with the lowest average value_type for each cluster
   full_clusterdf <- full_clusterdf %>%
     group_by(Cluster) %>%
@@ -61,18 +62,18 @@ all_clusters_hmap <- function(full_clusterdf, value_type = "Padj", x_labels = NU
     as.matrix()
   rownames(heatmap_matrix) <- cluster_labels  # Set custom x-axis labels
 
-  # Set custom x-axis labels if provided
+  # set custom x-axis labels if provided
   if (!is.null(x_labels) && length(x_labels) == ncol(heatmap_matrix)) {
     colnames(heatmap_matrix) <- x_labels
   }
-  # Set y-axis labels based on term with lowest avg padj
+  # set y-axis labels based on term with lowest avg padj
   rownames(heatmap_matrix) <- cluster_labels
 
-  # Apply log10 transformation if required
+  # apply log10 transformation if required
   heatmap_matrix <- -log10(heatmap_matrix)
   heatmap_matrix[is.infinite(heatmap_matrix)] <- 0  # Handle -log10(0) which results in -Inf
 
-  # Set the title of the heatmap
+  # set the title of the heatmap
   if (is.null(title)) {
     title <- paste0("-log10(", value_type, ") by Cluster")
   }
@@ -84,7 +85,7 @@ all_clusters_hmap <- function(full_clusterdf, value_type = "Padj", x_labels = NU
     ylab = "Cluster",
     main = title,
     colors = c("grey", viridis::viridis(256)),
-    na.value = "grey",  # Set the color for NA values to grey
+    na.value = "grey",
     margins = c(50, 50, 50, 50),
     show_dendrogram = c(TRUE, FALSE),
     plot_method = "plotly",
@@ -92,6 +93,47 @@ all_clusters_hmap <- function(full_clusterdf, value_type = "Padj", x_labels = NU
   )
 
   return(s_hmap)
+}
+
+summary_data <- make_summary_data((cluster_result$cluster_df))
+
+
+full_hmap <- function(cluster_result, value_type="Padj", value_by="mean") {
+
+  # clean 0/inf values before taking mean
+  clean_zeros <- function(x) {
+    x[is.nan(x) | is.infinite(x)] <- NA
+    return(x)
+  }
+  cluster_df <- cluster_result$cluster_df %>%
+    mutate(across(where(is.numeric), clean_zeros))
+
+  # group by and aggregate into clusters
+  # only taking pvalue columns and
+  cluster_df <- cluster_df %>%
+    group_by(Cluster) %>%
+    summarise(across(starts_with("Padj"), mean, na.rm=TRUE))
+
+
+}
+
+full_hmap <- function(cluster_result, value_type="Padj", value_by="mean") {
+
+  # clean 0/inf values before taking mean
+  clean_zeros <- function(x) {
+    x[is.nan(x) | is.infinite(x)] <- NA
+    return(x)
+  }
+  cluster_df <- cluster_result$cluster_df %>%
+    mutate(across(where(is.numeric), clean_zeros))
+
+  # group by and aggregate into clusters
+  # only taking pvalue columns and
+  cluster_df <- cluster_df %>%
+    group_by(Cluster) %>%
+    summarise(across(starts_with("Padj"), mean, na.rm=TRUE))
+
+
 }
 
 

@@ -31,8 +31,8 @@ match the length of `enrichment_results`. Default is `NA_character_`.}
 }
 \value{
 A named list containing:
-        - `DistanceMatrix`: The distance matrix used in clustering.
-        - `Clusters`: The final clusters.
+        - `distance_matrix`: The distance matrix used in clustering.
+        - `clusters`: The final clusters.
         - `df_list`: The original list of enrichment result dataframes.
         - `merged_df`: The merged dataframe containing combined results.
         - `cluster_options`: A list of clustering parameters used in the analysis.
@@ -48,5 +48,5 @@ enrichment_results <- list(
   df2 = data.frame(Term = c("A", "C"), GeneID = c("gene3", "gene4"), Padj = c(0.03, 0.04))
 )
 result <- cluster(enrichment_results, distance_metric = "kappa", distance_cutoff = 0.5)
-print(result$DistanceMatrix)
+print(result$distance_matrix)
 }

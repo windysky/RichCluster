@@ -50,6 +50,9 @@ cluster <- function(enrichment_results, df_names=NULL, min_terms=5,
   geneID_vec <- merged_df$GeneID
   padj_vec <- merged_df$Padj
 
+  merged_df <- merged_df %>%
+    filter(Pvalue < 0.1) # as default, but user adjusts if they want
+
   # throw error if cluster options are invalid
 
   cluster_result <- RichCluster::RichCluster(

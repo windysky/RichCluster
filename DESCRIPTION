@@ -24,10 +24,11 @@ Suggests:
 Config/testthat/edition: 3
 Collate: 
     'RcppExports.R'
-    'all_clusters_hmap.R'
+    'bars.R'
     'cluster.R'
     'cluster_correlation.R'
     'full_network.R'
+    'hmaps.R'
     'load_all.R'
     'merge_enrichment_results.R'
     'package.R'

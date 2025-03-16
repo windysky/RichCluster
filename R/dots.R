@@ -76,9 +76,9 @@ cluster_dot <- function(cluster_result, clusters=NULL, value_type="Padj", title=
   # add layout stuff
   dot <- dot%>% plotly::layout(
     title = title,
-    margin = list(autoexpand=TRUE, t=50, b=50),
+    margin = list(autoexpand=TRUE, t=50, b=-50),
     xaxis = list(title = "-log10(Padj)"),
-    yaxis = list(title = "Term")
+    yaxis = list(title = "Cluster")
   )
   return(dot)
 }
@@ -161,7 +161,7 @@ term_dot <- function(cluster_result, cluster=1, value_type="Padj", title=NULL) {
   # add layout stuff
   dot <- dot%>% plotly::layout(
     title = title,
-    margin = list(autoexpand=TRUE, t=50, b=50),
+    margin = list(autoexpand=TRUE, t=50, b=-50),
     xaxis = list(title = "-log10(Padj)"),
     yaxis = list(title = "Term")
   )

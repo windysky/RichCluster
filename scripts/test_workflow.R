@@ -59,3 +59,6 @@ c_dot
 
 t_dot <- RichCluster::term_dot(cluster_result, 48)
 t_dot
+
+cluster_df <- RichCluster::export_df(cluster_result)
+# write.csv(cluster_df, "~/Downloads/cluster_df.csv", row.names=FALSE)

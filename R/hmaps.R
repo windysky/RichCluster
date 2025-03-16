@@ -126,7 +126,7 @@ cluster_hmap <- function(cluster_result, clusters=NULL, value_type="Padj", aggr_
 #' (no hierarchical clustering).
 #'
 #' @export
-term_hmap <- function(cluster_result, clusters, terms, value_type, aggr_type) {
+term_hmap <- function(cluster_result, clusters, terms, value_type, aggr_type, title=NULL) {
 
   cluster_df <- cluster_result$cluster_df
 
@@ -186,19 +186,36 @@ term_hmap <- function(cluster_result, clusters, terms, value_type, aggr_type) {
   rownames(hmap_matrix) <- row_names
   colnames(hmap_matrix) <- cluster_result$df_names
 
-  h <- heatmaply::heatmaply(
+  # generate default title if none supplied
+  if (is.null(title)) {
+    cluster_str <- paste(final_terms, ', ')
+    title <- paste0("-log10(", value_type, ")")
+    print(title)
+  }
+
+  h <- iheatmapr::main_heatmap(
     hmap_matrix,
-    xlab = "Enrichment Result",
-    ylab = "Term",
-    main = paste0("-log10(", value_type, ")"),
-    colors = viridis::viridis(256),
-    row_side_colors = cluster_annots,
-    row_text_angle = 0,
-    margins = c(60, 120, 40, 10),
-    plot_method = "plotly",
-    colorbar_title = paste0("-log10(", value_type, ")"),
-    cluster_rows=FALSE, cluster_cols=FALSE,
-    Rowv=FALSE, Colv=FALSE,
-  )
+    name=paste0("-log10(", value_type, ")")
+  ) %>%
+    iheatmapr::add_row_title("Term") %>%
+    iheatmapr::add_col_title(title, side=c("top")) %>%
+    iheatmapr::add_col_title("Enrichment Result", side=c("bottom")) %>%
+    iheatmapr::add_row_annotation(data.frame("Cluster"=cluster_annots))
+
+
+  # h <- heatmaply::heatmaply(
+  #   hmap_matrix,
+  #   xlab = "Enrichment Result",
+  #   ylab = "Term",
+  #   main = paste0("-log10(", value_type, ")"),
+  #   colors = viridis::viridis(256),
+  #   row_side_colors = cluster_annots,
+  #   row_text_angle = 0,
+  #   margins = c(60, 120, 40, 10),
+  #   plot_method = "plotly",
+  #   colorbar_title = paste0("-log10(", value_type, ")"),
+  #   cluster_rows=FALSE, cluster_cols=FALSE,
+  #   Rowv=FALSE, Colv=FALSE,
+  # )
   return(h)
 }

@@ -15,6 +15,7 @@ Imports:
   dplyr,
   tidyverse,
   heatmaply,
+  iheatmapr,
   igraph,
   networkD3
 LinkingTo: Rcpp

@@ -4,7 +4,7 @@
 \alias{term_hmap}
 \title{Generate a Heatmap of Enrichment Results for Specific Clusters and Terms}
 \usage{
-term_hmap(cluster_result, clusters, terms, value_type, aggr_type)
+term_hmap(cluster_result, clusters, terms, value_type, aggr_type, title = NULL)
 }
 \arguments{
 \item{cluster_result}{A list containing a data frame (`cluster_df`) with clustering results.

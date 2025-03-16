@@ -10,6 +10,7 @@ na_to_zero <- function(x) {
 }
 
 # create a heatmap with all clusters
+
 #' Create a Heatmap of Clustered Enrichment Results
 #'
 #' Generates an interactive heatmap from the given clustering results,

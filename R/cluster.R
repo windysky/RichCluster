@@ -8,7 +8,9 @@
 #' @param enrichment_results A list of dataframes, each containing enrichment results.
 #'        Each dataframe should include at least the columns 'Term', 'GeneID', and 'Padj'.
 #' @param df_names Optional, a character vector of names for the enrichment result dataframes. Must
-#'        match the length of `enrichment_results`. Default is `NA_character_`.
+#'        match the length of `enrichment_results`. Default is `NULL`.
+#' @param min_terms Minimum number of terms each final cluster must include
+#' @param min_value Minimum 'Pvalue' a term must have in order to be counted in final clustering
 #' @param distance_metric A string specifying the distance metric to use (e.g., "kappa").
 #' @param distance_cutoff A numeric value for the distance cutoff (0 < cutoff <= 1).
 #' @param merge_strategy A string specifying the merge strategy to use (e.g., "DAVID").
@@ -30,7 +32,7 @@
 #' result <- cluster(enrichment_results, distance_metric = "kappa", distance_cutoff = 0.5)
 #' print(result$distance_matrix)
 #' @export
-cluster <- function(enrichment_results, df_names=NULL, min_terms=5,
+cluster <- function(enrichment_results, df_names=NULL, min_terms=5, min_value=0.05,
                     distance_metric="kappa", distance_cutoff=0.5,
                     merge_strategy="DAVID", membership_cutoff=0.5) {
 
@@ -51,7 +53,7 @@ cluster <- function(enrichment_results, df_names=NULL, min_terms=5,
   padj_vec <- merged_df$Padj
 
   merged_df <- merged_df %>%
-    filter(Pvalue < 0.1) # as default, but user adjusts if they want
+    filter(Pvalue < min_value) # as default, but user adjusts if they want
 
   # throw error if cluster options are invalid
 

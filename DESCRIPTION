@@ -27,6 +27,8 @@ Collate:
     'bars.R'
     'cluster.R'
     'cluster_correlation.R'
+    'dots.R'
+    'export_df.R'
     'full_network.R'
     'hmaps.R'
     'load_all.R'

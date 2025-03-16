@@ -8,6 +8,7 @@ cluster(
   enrichment_results,
   df_names = NULL,
   min_terms = 5,
+  min_value = 0.05,
   distance_metric = "kappa",
   distance_cutoff = 0.5,
   merge_strategy = "DAVID",
@@ -19,7 +20,11 @@ cluster(
 Each dataframe should include at least the columns 'Term', 'GeneID', and 'Padj'.}
 
 \item{df_names}{Optional, a character vector of names for the enrichment result dataframes. Must
-match the length of `enrichment_results`. Default is `NA_character_`.}
+match the length of `enrichment_results`. Default is `NULL`.}
+
+\item{min_terms}{Minimum number of terms each final cluster must include}
+
+\item{min_value}{Minimum 'Pvalue' a term must have in order to be counted in final clustering}
 
 \item{distance_metric}{A string specifying the distance metric to use (e.g., "kappa").}
 

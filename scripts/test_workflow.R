@@ -35,18 +35,27 @@ test_workflow <- function(cluster_result, min_terms=5) {
 
 }
 
-cluster_result <- load_cluster_data(from_scratch=TRUE)
+cluster_result <- load_cluster_data(from_scratch=FALSE)
 
-# hmap <- test_workflow(cluster_result, 10)
-# hmap
+# ALL VISUALIZATION TESTS
+# ---
+c_hmap <- RichCluster::cluster_hmap(cluster_result)
+c_hmap
 
-# new tests
-hmap <- RichCluster::cluster_hmap(cluster_result)
-hmap
-
-# clusters 4, 6, 8
+# clusters 4, 6, 8 + terms from clusters x,y,z
 clusters <- c("mating plug formation", "regulation of protein refolding", "regulation of plasma cell differentiation")
 terms <- c("neuroblast proliferation", "regulation of tissue remodeling", "protein secretion")
+t_hmap <- RichCluster::term_hmap(cluster_result, clusters, terms, value_type="Padj")
+t_hmap
 
-h <- RichCluster::term_hmap(cluster_result, clusters, terms, value_type="Padj")
+c_bar <- RichCluster::cluster_bar(cluster_result)
+c_bar
 
+t_bar <- RichCluster::term_bar(cluster_result, 48)
+t_bar
+
+c_dot <- RichCluster::cluster_dot(cluster_result)
+c_dot
+
+t_dot <- RichCluster::term_dot(cluster_result, 48)
+t_dot

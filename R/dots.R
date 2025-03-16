@@ -1,4 +1,5 @@
 
+#' @export
 cluster_dot <- function(cluster_result, clusters=NULL, value_type="Padj", title=NULL) {
   cluster_df <- cluster_result$cluster_df
   df_names <- cluster_result$df_names
@@ -84,6 +85,7 @@ cluster_dot <- function(cluster_result, clusters=NULL, value_type="Padj", title=
 # cdot <- cluster_dot(cluster_result)
 # cdot
 
+#' @export
 term_dot <- function(cluster_result, cluster=1, value_type="Padj", title=NULL) {
 
   cluster_df <- cluster_result$cluster_df

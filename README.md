@@ -80,12 +80,14 @@ The name of each cluster is determined as the term in the cluster with the highe
 We support two broad categories of cluster visualization:
 1. Cluster-level: Aggregates pvalue across all terms in the cluster, to compare different clusters to each other
 2. Term-level: Displays individual term pvalues *within* a cluster
+
 Where comparisons are also done across the different enrichment results which originally went into clustering.
 
 Using these two categories, we have three different types of plots which are currently supported:
 1. Heatmaps
 2. Bar plots
 3. Dot plots
+
 As well as an option to export as a dataframe (CSV).
 
 ### Heatmaps
@@ -111,7 +113,6 @@ As well as an option to export as a dataframe (CSV).
 `cluster_dot` shows the enrichment data with the size of the cluster being associated with dot radius and the x-axis being the -log10(pvalue).
 
 <img src="https://github.com/user-attachments/assets/1cbe0bfc-e9c7-4137-bac2-75fd5f1da7f0" width="500" height="auto">
-
 
 `term_dot` shows the enrichment data with the number of genes in each term being associated with dot radius and the x-axis being the -log10(pvalue).
 

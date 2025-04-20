@@ -25,9 +25,11 @@ void ClusterList::filterSeeds(MergeStrategy MS) {
 void ClusterList::mergeClusters(MergeStrategy MS) {
   bool mergingPossible = true;
   while (mergingPossible) {
+
     mergingPossible = false;
     int n_MergedGroups = 0; // stopping criteria, if 0 after outer loop then exit while loop
 
+    // --- FIND BEST MERGE PARTNER LOOP ---
     auto it1 = clusterList.begin();
     while (it1 != clusterList.end()) {
       auto clusterGroup1 = *it1;
@@ -44,14 +46,15 @@ void ClusterList::mergeClusters(MergeStrategy MS) {
           continue; // skip
         }
 
+        // merge clusters and compute membership of merged group
         auto clusterGroup2 = *it2;
-
         std::unordered_set<int> mergedCluster;
         mergedCluster.insert(clusterGroup1.begin(), clusterGroup1.end());
         mergedCluster.insert(clusterGroup2.begin(), clusterGroup2.end());
 
         double mergeMembership = MS.calculateMembership(mergedCluster, _distanceFunction);
 
+        // if above our desired cutoff
         if (mergeMembership >= MS.getMembershipCutoff()) {
           if (mergeMembership >= bestMergeMembership) {
             bestMergePartnerIndex = partnerIndex;
@@ -63,18 +66,18 @@ void ClusterList::mergeClusters(MergeStrategy MS) {
         ++partnerIndex;
       }
 
+      // --- THE MERGING, AFTER WE FOUND OUR PARTNER ---
       if (bestMergePartnerIndex != -1 && bestMergeMembership >= MS.getMembershipCutoff()) {
         std::unordered_set<int> mergedCluster;
         mergedCluster.insert(clusterGroup1.begin(), clusterGroup1.end());
         mergedCluster.insert(bestMergePartnerIt->begin(), bestMergePartnerIt->end());
 
-        // Remove clusterGroup1 and clusterGroup2 from clusterList
+        // remove original two clusters from clusterList
         it1 = clusterList.erase(it1);
         if (bestMergePartnerIt != clusterList.end()) {
           clusterList.erase(bestMergePartnerIt);
         }
-
-        // Add mergedCluster to clusterList
+        // and add the MERGED cluster back to clusterList
         clusterList.push_back(mergedCluster);
 
         n_MergedGroups++;
@@ -91,7 +94,7 @@ void ClusterList::mergeClusters(MergeStrategy MS) {
   }
 }
 
-// Export ClusterList as a R dataframe with termNames and index values
+// export ClusterList as a R dataframe with termNames and index values
 Rcpp::DataFrame ClusterList::export_RDataFrame() {
   std::vector<std::string> termIndicesColumn;
   std::vector<std::string> termNamesColumn;

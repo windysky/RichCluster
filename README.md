@@ -6,8 +6,11 @@ Terms are clustered together based on how many genes are shared between them. We
 - Jaccard index
 
 As well as different linkage criteria for iteratively merging clusters together.
-- Multiple linkage (from DAVID method)
-- Ward linkage
+- Multiple linkage (from DAVID implementation)
+- Single
+- Complete
+- Average
+- Ward
 
 ## Installation
 The package is currently under review in submission to CRAN, but for now users can install the package and try out the clustering and visualization features by installing through GitHub.
@@ -21,76 +24,122 @@ install_github("hyuncat/RichCluster")
 ## Usage
 The basic flow is as follows. A demo can be followed along through the attached vignettes.
 
-### Geneset formatting
-Load in your desired genesets as R dataframes. `merge_genesets()` accepts a named list of genesets, the names you input here will be displayed as labels in the visualizations. You can edit these later.
+<img src="https://github.com/user-attachments/assets/f5c857bc-8547-445f-be15-b9a1102f76f4" width="500" height="auto">
 
-The script will try to combine the genesets so that shared 'Term' rows will have their GeneID's merged. If you are receiving errors, please try renaming your columns of interest to 'Term' and 'GeneID' across all genesets of interest, and make sure the formatting of the columns is consistent (eg, same spellings) across all genesets.
-
-Note, since the goal of the visualizations is to show the expression level of these clusters, we need to specify the format of the 'value' to display. Hence, `merge_genesets()` accepts a second argument 'value_columns', a character vector to specify the names of all the columns containing numeric values of interest to plot later. 
-
-```r
-rr1 <- read.csv(system.file("extdata", "7mo_DEG.csv", package="RichCluster"))
-
-rr2 <- read.csv(system.file("extdata", "7mo_DMR.csv", package="RichCluster"))
-
-richsets <- list(rr1, rr2)
-richnames <- c('7mo_DEG', '7mo_DMR')
-```
-
-The output of `merge_genesets()` is a MergeObject, which is a named list with the corresponding data to easily plug and chug into the rest of the workflow. If you want to extract any part of it and tinker around, the relevant attributes are
-- MergeObject$df - The big merged dataframe of all geneset data
-- MergeObject$gs_names - Character vector of names with indices corresponding to the original index of the geneset in the argument.
+The user can supply a list of enrichment results, and simply run `cluster()` with certain options to return a `ClusterResult` named list object which is all you need to pass in order to the various visualization functions.
 
 ## Clustering
-To cluster the merged geneset, run `rich_cluster()` on the MergeObject. (Note this is only for convenience, to preserve the naming scheme of the genesets. If you would like to skip this you can alternatively call the overloaded method acting only on a dataframe object.)
+The goal of the RichCluster package is to simplify the workflow of clustering biological terms across multiple enrichment results. 
 
-Note the clustering script automatically looks for 'Term' and 'GeneID' columns to determine group candidates for clustering. If you are facing issues, please make sure your columns are named correctly or raise a GitHub issue.
+- For instance, if a user has 3 different enrichment data corresponding to the same mouse at different stages of a disease and wants to directly compare those results side by side.
 
-A default clustering option can be run with Kappa similarity, but RichCluster can be customized with the following other options.
+Our `cluster()` function accepts any arbitrary number of enrichment results in a list, and then will cluster different `$Term` rows together based on how many shared genes they have in the `$GeneID` column.
 
-### Similarity metric
-Type
-- Kappa
-- Jaccard index
+### Cluster input formatting
+The absolute minimum a user must do is to provide a list of dataframes corresponding to the enrichment results they want to cluster.
 
-Cutoff
-- Only consider clusters where its terms have above this cutoff value of similarity.
+- `enrichment_results` - A list of dataframes, each containing enrichment results. Each dataframe should include at least the columns 'Term', 'GeneID', and 'Padj'.
+
+### Basic options
+Some basic options to customize clustering outputs include:
+- `df_names` - An optional character vector of names for the enrichment result dataframes. Must match the length of `enrichment_results`. Default is NULL.
+- `min_terms` - Minimum number of terms each final cluster must include
+- `min_value` - Minimum 'Pvalue' a term must have in order to be counted in final clustering
+
+### Distance metric
+We also allow user to specify which distance metric / cutoff score they want to use to cluster terms together.
+- `distance_metric` - A string specifying the distance metric to use (e.g., "kappa").
+- `distance_cutoff` - A numeric value for the distance cutoff (0 < cutoff <= 1).
+
+Note that we technically are using a 'similarity' metric, so the cutoff is the *minimum* kappa score (for instance) that two terms must share in order to be clustered together. Hence a higher cutoff would lead to stricter clustering / smaller clusters.
 
 ### Merge strategy
-- DAVID multiple linkage membership
-- Single
-- Complete
-- Average
-- Ward
+After an initial grouping of terms based on having a distance score above a certain cutoff, we merge our initial "seed groups" (pre-clusters) together based on the provided merge strategy.
 
-The output of the clustering is a ClusterResult which can be directly inputted into the visualizations or exported as a csv file with some additional options.
+- `merge_strategy` - A string specifying the merge strategy to use (e.g., "DAVID").
+- `membership_cutoff` - A numeric value between 0 and 1 for the membership cutoff
+
+The default uses DAVID's strategy of multiple linkage, which takes a certain membership_cutoff and merges seeds together if their combined 'membership' score is above the threshold.
+Where membership is defined as that percentage of term pairs in the seed group which have a distance score above the distance_cutoff.
+
+The total list of supported metrics includes: 
+- `"david"` - DAVID multiple linkage membership
+- `"single"`
+- `"complete"`
+- `"average"`
+- `"ward"` (recommended)
+
+Again, a higher membership_cutoff leads to stricter (smaller) clusters.
+
+### Output
+The output of the `cluster()` function is a `ClusterResult` which can be directly inputted into the visualizations or exported as a csv file with some additional options.
 
 The name of each cluster is determined as the term in the cluster with the highest gene count.
 
 ## Visualizations
+We support two broad categories of cluster visualization:
+1. Cluster-level: Aggregates pvalue across all terms in the cluster, to compare different clusters to each other
+2. Term-level: Displays individual term pvalues *within* a cluster
+
+Where comparisons are also done across the different enrichment results which originally went into clustering.
+
+Using these two categories, we have three different types of plots which are currently supported:
+1. Heatmaps
+2. Bar plots
+3. Dot plots
+
+As well as an option to export as a dataframe (CSV).
+
+### Heatmaps
+`cluster_hmap` displays the -log10(pvalue) of all the different clusters across the user's supplied enrichment results.
+
+<img src="https://github.com/user-attachments/assets/cd5197ba-a1bf-4f40-a2b8-73eca9f1af1b" width="500" height="auto">
+
+`term_hmap` displays the -log10(pvalue) of the union of all terms in the specified clusters, as well as any additional terms specified.
+
+<img src="https://github.com/user-attachments/assets/9ecd9686-d2dc-4548-b51e-61c8a7029817" width="500" height="auto">
+
+### Bar plots
+`cluster_bar` displays the -log10(pvalue) of all the different clusters across the user's supplied enrichment results.
+
+<img src="https://github.com/user-attachments/assets/2d856a58-4a30-4870-b0ca-b3a2ea48a23d" width="600" height="auto">
+
+`term_bar` displays the pvalue of all terms within a single cluster across the different input enrichment results.
+
+<img src="https://github.com/user-attachments/assets/169c0a7b-0e0f-4f91-b9cf-8698bb2a13aa" width="500" height="auto">
+
+
+### Dot plots
+`cluster_dot` shows the enrichment data with the size of the cluster being associated with dot radius and the x-axis being the -log10(pvalue).
+
+<img src="https://github.com/user-attachments/assets/1cbe0bfc-e9c7-4137-bac2-75fd5f1da7f0" width="500" height="auto">
+
+`term_dot` shows the enrichment data with the number of genes in each term being associated with dot radius and the x-axis being the -log10(pvalue).
+
+<img src="https://github.com/user-attachments/assets/dc76c127-f7f9-4f6e-9bbd-56c74d2c2107" width="500" height="auto">
+
 ### Export as CSV
-Users can simply export the final clustered data as a CSV file and save their results for later. Then users can load in the file directly and visualize the clusters again.
+To view the data in excel / as a dataframe, users can export the final clustered data as a dataframe with `export_df` and save their results to a csv as follows.
 
-### Multi-geneset heatmap
-RichCluster's advantage is in its ability for highly customizable heatmap generation and comparison of enrichment data across multiple genesets.
+```r
+cluster_df <- RichCluster::export_df(cluster_result)
+write.csv(cluster_df, "~/Downloads/cluster_df.csv", row.names=FALSE)
+```
 
-Value options
-- Name of the column value to visualize (column must be numeric type, and present across all genesets in ClusterResult)
-- Type of column aggregation (mean, median, min, max, mode)
+Otherwise, to retain access to the entire suite of visualization functions users can also download the entire cluster_result as a list object as follows:
+```r
+saveRDS(cluster_result, file = "~/Downloads/cluster_result.rds")
+```
 
-Additional options:
-- Plot title
-- Edit geneset names
+Then read it back in as an R list as such:
+```r
+cluster_result <- readRDS('~/Downloads/cluster_result.rds')
+```
 
-![all_clusters_hmap 1](https://github.com/user-attachments/assets/0a0bac15-f1a9-404f-985c-3aa154f36f52)
-
-
-### Intra-cluster similarity
-
-![cluster7_correlation](https://github.com/user-attachments/assets/18a1aeb2-b221-41f4-a79a-1dcc5f3b2522)
-
-### Cluster Network
-
-<img src="https://github.com/user-attachments/assets/22021356-d352-45ff-a627-7e0156413f86" width="300">
+to avoid re-clustering large datasets across multiple work sessions.
 
 
+## Troubleshooting
+Note: If you are receiving errors, please try renaming your columns of interest to 'Term' and 'GeneID' across all genesets of interest, and make sure the formatting of the columns is consistent (eg, same Term/GeneID name spellings) across all datasets.
+
+If that doesn't work, feel free to raise a GitHub issue or email @ssh2198@columbia.edu and I'll try to help you with your problem.

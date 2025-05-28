@@ -6,18 +6,24 @@ Author: Who wrote it
 Maintainer: Sarah Hong <ssh2198@columbia.edu>
 Description: Customizable C++ algorithm for hierarchical agglomerative clustering of biological terms 
     by gene similarity (kappa/jaccard), with supporting visualizations for easy use.
-License: What license is it under?
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports:
   Rcpp (>= 1.0.12),
   cpp11,
   dplyr,
-  tidyverse,
+  DT,
   heatmaply,
+  htmltools,
   iheatmapr,
   igraph,
-  networkD3
+  magrittr,
+  networkD3,
+  plotly,
+  shiny,
+  shinydashboard,
+  viridis
 LinkingTo: Rcpp
 RoxygenNote: 7.3.2
 Suggests: 

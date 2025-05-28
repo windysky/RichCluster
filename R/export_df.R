@@ -14,16 +14,16 @@ export_df <- function(cluster_result) {
   df_names <- cluster_result$df_names
 
   # create representative term column (ClusterName)
-  representative_terms <- cluster_df %>%
-    group_by(Cluster) %>%
-    filter(Pvalue==min(Pvalue, na.rm=TRUE)) %>%
-    slice(1) %>%
-    ungroup %>%
-    pull(Term)
+  representative_terms <- cluster_df magrittr::%>%
+    dplyr::group_by(Cluster) magrittr::%>%
+    dplyr::filter(Pvalue==min(Pvalue, na.rm=TRUE)) magrittr::%>%
+    dplyr::slice(1) magrittr::%>%
+    dplyr::ungroup() magrittr::%>%
+    dplyr::pull(Term)
 
-  cluster_df <- cluster_df %>%
-    mutate(ClusterName=representative_terms[Cluster]) %>%
-    select(Cluster, ClusterName, everything())
+  cluster_df <- cluster_df magrittr::%>%
+    dplyr::mutate(ClusterName=representative_terms[Cluster]) magrittr::%>%
+    dplyr::select(Cluster, ClusterName, dplyr::everything())
 
   # replace _* with _dfname[*]
   df_colnames <- colnames(cluster_df)

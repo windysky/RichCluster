@@ -3,9 +3,9 @@
 \docType{_PACKAGE}
 \name{RichCluster}
 \alias{RichCluster}
-\title{RichStudio: A package for FGSEA and clustering}
+\title{RichCluster: A package for FGSEA and clustering}
 \description{
-RichStudio provides tools for Functional Gene Set Enrichment Analysis (FGSEA) and clustering of enrichment results.
+RichCluster provides tools for Functional Gene Set Enrichment Analysis (FGSEA) and clustering of enrichment results.
 }
 \section{RichCluster functions}{
 

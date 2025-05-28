@@ -1,16 +1,16 @@
 
 homeTabUI <- function(id, tabName) {
-  ns <- NS(id)
-  tabItem(tabName = tabName,
-          h1("RichCluster Shiny App"),
-          p("Developed by Sarah Hong")
+  ns <- shiny::NS(id)
+  shiny::tabItem(tabName = tabName,
+          shiny::h1("RichCluster Shiny App"),
+          shiny::p("Developed by Sarah Hong")
   )
 }
 
 
 homeTabServer <- function(id) {
 
-  moduleServer(id, function(input, output, session) {
+  shiny::moduleServer(id, function(input, output, session) {
 
 
   })

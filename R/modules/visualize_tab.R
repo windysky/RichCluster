@@ -1,16 +1,16 @@
 
 visualizeTabUI <- function(id, tabName) {
-  ns <- NS(id)
-  tabItem(tabName = tabName,
-          h1("Welcome to RichStudio v0.1.5!"),
-          p("Upload from differential expression geneset (DEG) or enrichment result. Supports kappa clustering and multiple visualizations.")
+  ns <- shiny::NS(id)
+  shiny::tabItem(tabName = tabName,
+          shiny::h1("Welcome to RichStudio v0.1.5!"),
+          shiny::p("Upload from differential expression geneset (DEG) or enrichment result. Supports kappa clustering and multiple visualizations.")
   )
 }
 
 
 visualizeTabServer <- function(id) {
 
-  moduleServer(id, function(input, output, session) {
+  shiny::moduleServer(id, function(input, output, session) {
 
 
   })

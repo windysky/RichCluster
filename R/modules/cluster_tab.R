@@ -1,46 +1,46 @@
 
 clusterTabUI <- function(id, tabName) {
-  ns <- NS(id)
-  tabItem(tabName = tabName,
-    h1("Cluster Enrichment Results"),
-    fluidRow(
-      column(width=4,
-        box(
+  ns <- shiny::NS(id)
+  shiny::tabItem(tabName = tabName,
+    shiny::h1("Cluster Enrichment Results"),
+    shiny::fluidRow(
+      shiny::column(width=4,
+        shinydashboard::box(
           title = "Upload Enrichment Results",
           status = "primary",
           solidHeader = TRUE,
           collapsible = TRUE,
           width = NULL,
-          fileInput(ns("rich_upload"), 'Select files', multiple=TRUE, accept=c('.csv', '.tsv', '.xls', '.txt')),
-          actionButton(ns("submit"), "Submit"),
-          hr(),
-          h4('Load demo'),
-          p("Loads sample files: 'go1', 'go2'"),
-          actionButton(ns("rich_load"), "Load")
+          shiny::fileInput(ns("rich_upload"), 'Select files', multiple=TRUE, accept=c('.csv', '.tsv', '.xls', '.txt')),
+          shiny::actionButton(ns("submit"), "Submit"),
+          shiny::hr(),
+          shiny::h4('Load demo'),
+          shiny::p("Loads sample files: 'go1', 'go2'"),
+          shiny::actionButton(ns("rich_load"), "Load")
         )
       ),
-      column(width=8,
-        tabBox(width=NULL,
-          tabPanel("Distance Matrix",
-            h4("Select enrichment results"),
-            selectInput(ns('select_rs_for_distmatrix'), "Select enrichment results to compute distances", choices=NULL, multiple=TRUE),
-            selectInput(ns('dist_metric'), "Select distance metric", choices=c("kappa", "jaccard")),
-            selectInput(ns('membership_strategy'), "Select membership strategy", choices=c("DAVID", "Ward")),
-            actionButton(ns('compute_distances'), 'Compute Distances'),
-            br(),
-            br(),
+      shiny::column(width=8,
+        shinydashboard::tabBox(width=NULL,
+          shiny::tabPanel("Distance Matrix",
+            shiny::h4("Select enrichment results"),
+            shiny::selectInput(ns('select_rs_for_distmatrix'), "Select enrichment results to compute distances", choices=NULL, multiple=TRUE),
+            shiny::selectInput(ns('dist_metric'), "Select distance metric", choices=c("kappa", "jaccard")),
+            shiny::selectInput(ns('membership_strategy'), "Select membership strategy", choices=c("DAVID", "Ward")),
+            shiny::actionButton(ns('compute_distances'), 'Compute Distances'),
+            shiny::br(),
+            shiny::br(),
             DT::dataTableOutput(ns("distance_matrix"))
           ),
-          tabPanel("Filter Clusters",
-            numericInput(ns('min_terms'), "Minimum number of terms", value=5),
-            actionButton(ns('filter_clusters'), 'Filter Clusters'),
+          shiny::tabPanel("Filter Clusters",
+            shiny::numericInput(ns('min_terms'), "Minimum number of terms", value=5),
+            shiny::actionButton(ns('filter_clusters'), 'Filter Clusters'),
             DT::dataTableOutput(ns("merged_seeds"))
           ),
-          tabPanel("Cluster Correlation",
-            selectInput(ns('select_cluster'), "Select cluster", choices=NULL),
+          shiny::tabPanel("Cluster Correlation",
+            shiny::selectInput(ns('select_cluster'), "Select cluster", choices=NULL),
             plotly::plotlyOutput(ns("cluster_correlation"))
           ),
-          tabPanel("Full Heatmap",
+          shiny::tabPanel("Full Heatmap",
             plotly::plotlyOutput(ns("full_heatmap"))
           ),
         )
@@ -52,29 +52,29 @@ clusterTabUI <- function(id, tabName) {
 
 clusterTabServer <- function(id, richnames, richsets) {
 
-  moduleServer(id, function(input, output, session) {
+  shiny::moduleServer(id, function(input, output, session) {
 
-    select_richnames <- reactive(richnames$labels)
-    merged_richsets <- reactiveVal(NULL)
+    select_richnames <- shiny::reactive(richnames$labels)
+    merged_richsets <- shiny::reactiveVal(NULL)
 
-    distance_matrix <- reactiveVal(NULL)
-    merged_seeds <- reactiveVal(NULL)
+    distance_matrix <- shiny::reactiveVal(NULL)
+    merged_seeds <- shiny::reactiveVal(NULL)
 
-    final_clusters <- reactiveVal(NULL)
-    full_clusterdf <- reactiveVal(NULL)
+    final_clusters <- shiny::reactiveVal(NULL)
+    full_clusterdf <- shiny::reactiveVal(NULL)
 
-    observe({
-      updateSelectInput(session=getDefaultReactiveDomain(), 'select_rs_for_distmatrix', choices=select_richnames())
+    shiny::observe({
+      shiny::updateSelectInput(session=shiny::getDefaultReactiveDomain(), 'select_rs_for_distmatrix', choices=select_richnames())
     })
 
     # <!----- UPLOAD LOGIC -----!>
-    observeEvent(input$rich_upload, {
-      req(input$rich_upload) # Make sure file uploaded
+    shiny::observeEvent(input$rich_upload, {
+      shiny::req(input$rich_upload) # Make sure file uploaded
 
       for (i in seq_along(input$rich_upload$name)) {
         richname <- input$rich_upload$name[i]
 
-        file_extension <- tools::file_ext(input$rich_upload$name[i])
+        file_extension <- tools::file_ext(input$rich_upload$name[i]) # tools::file_ext already correct
         file_path <- input$rich_upload$datapath[i]
 
         # try to read file as csv
@@ -115,14 +115,14 @@ clusterTabServer <- function(id, richnames, richsets) {
         richsets[[file_name]] <- rich_df
         richnames$labels <- c(richnames$labels, file_name)
       }
-      showNotification("Loaded demo files")
+      shiny::showNotification("Loaded demo files")
     })
 
-    observeEvent(input$compute_distances, {
-      req(input$select_rs_for_distmatrix)
-      req(input$dist_metric)
+    shiny::observeEvent(input$compute_distances, {
+      shiny::req(input$select_rs_for_distmatrix)
+      shiny::req(input$dist_metric)
 
-      withProgress(message="Computing distances...", value=0, {
+      shiny::withProgress(message="Computing distances...", value=0, {
         selected_richnames <- input$select_rs_for_distmatrix
         rich_dfs <- lapply(selected_richnames, function(richname) {
           richsets[[richname]]
@@ -133,7 +133,7 @@ clusterTabServer <- function(id, richnames, richsets) {
         geneID_vec <- merged_richsets$GeneID
         padj_vec <- merged_richsets$Padj
 
-        incProgress(0.3, message=NULL)
+        shiny::incProgress(0.3, message=NULL)
 
         cluster_results <- tryCatch(
           RichCluster::RichCluster(
@@ -146,12 +146,12 @@ clusterTabServer <- function(id, richnames, richsets) {
             padj_vec
           ),
           error = function(err) {
-            showNotification(err$message, type='error')
-            incProgress(0.7)
+            shiny::showNotification(err$message, type='error')
+            shiny::incProgress(0.7)
             return(NULL)
           }
         )
-        incProgress(0.6, message=NULL)
+        shiny::incProgress(0.6, message=NULL)
 
         if (!is.null(cluster_results)) {
           distance_matrix(cluster_results$DistanceMatrix)
@@ -166,14 +166,14 @@ clusterTabServer <- function(id, richnames, richsets) {
           full_clusterdf(RichCluster::make_full_clusterdf(final_clusters(), merged_richsets()))
 
         }
-        incProgress(0.1, message=NULL)
-        showNotification("Done!")
+        shiny::incProgress(0.1, message=NULL)
+        shiny::showNotification("Done!")
       })
     })
 
-    observeEvent(input$filter_clusters, {
-      req(input$min_terms)
-      req(merged_seeds())
+    shiny::observeEvent(input$filter_clusters, {
+      shiny::req(input$min_terms)
+      shiny::req(merged_seeds())
 
       final_clusters(RichCluster::filter_merged_seeds(merged_seeds(), input$min_terms))
       full_clusterdf(RichCluster::make_full_clusterdf(final_clusters(), merged_richsets()))
@@ -192,20 +192,20 @@ clusterTabServer <- function(id, richnames, richsets) {
     #   }
     # })
 
-    table_merged_seeds <- reactive({
-      req(!is.null(full_clusterdf()))
+    table_merged_seeds <- shiny::reactive({
+      shiny::req(!is.null(full_clusterdf()))
       return(full_clusterdf())
     })
     output$merged_seeds <- DT::renderDT({
       table_merged_seeds()
     })
 
-    plot_all_clusters_hmap <- reactive({
-      req(!is.null(full_clusterdf()))
+    plot_all_clusters_hmap <- shiny::reactive({
+      shiny::req(!is.null(full_clusterdf()))
       hmap <- RichCluster::all_clusters_hmap(full_clusterdf(), "Padj")
       return(hmap)
     })
-    output$full_heatmap = plotly::renderPlotly({
+    output$full_heatmap = plotly::renderPlotly({ # plotly::renderPlotly already correct
       hmap <- RichCluster::all_clusters_hmap(full_clusterdf(), "Padj")
     })
 

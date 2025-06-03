@@ -10,19 +10,19 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// RichCluster
-Rcpp::List RichCluster(std::string distanceMetric, double distanceCutoff, std::string linkageMethod, double linkageCutoff, Rcpp::CharacterVector termNameColumn, Rcpp::CharacterVector geneIDColumn);
-RcppExport SEXP _RichCluster_RichCluster(SEXP distanceMetricSEXP, SEXP distanceCutoffSEXP, SEXP linkageMethodSEXP, SEXP linkageCutoffSEXP, SEXP termNameColumnSEXP, SEXP geneIDColumnSEXP) {
+// RichCluster_cpp_wrapper_function
+Rcpp::List RichCluster_cpp_wrapper_function(SEXP distanceMetricSEXP, SEXP distanceCutoffSEXP, SEXP linkageMethodSEXP, SEXP linkageCutoffSEXP, SEXP termNameColumnSEXP, SEXP geneIDColumnSEXP);
+RcppExport SEXP _RichCluster_RichCluster_cpp_wrapper_function(SEXP distanceMetricSEXPSEXP, SEXP distanceCutoffSEXPSEXP, SEXP linkageMethodSEXPSEXP, SEXP linkageCutoffSEXPSEXP, SEXP termNameColumnSEXPSEXP, SEXP geneIDColumnSEXPSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::string >::type distanceMetric(distanceMetricSEXP);
-    Rcpp::traits::input_parameter< double >::type distanceCutoff(distanceCutoffSEXP);
-    Rcpp::traits::input_parameter< std::string >::type linkageMethod(linkageMethodSEXP);
-    Rcpp::traits::input_parameter< double >::type linkageCutoff(linkageCutoffSEXP);
-    Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type termNameColumn(termNameColumnSEXP);
-    Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type geneIDColumn(geneIDColumnSEXP);
-    rcpp_result_gen = Rcpp::wrap(RichCluster(distanceMetric, distanceCutoff, linkageMethod, linkageCutoff, termNameColumn, geneIDColumn));
+    Rcpp::traits::input_parameter< SEXP >::type distanceMetricSEXP(distanceMetricSEXPSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type distanceCutoffSEXP(distanceCutoffSEXPSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type linkageMethodSEXP(linkageMethodSEXPSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type linkageCutoffSEXP(linkageCutoffSEXPSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type termNameColumnSEXP(termNameColumnSEXPSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type geneIDColumnSEXP(geneIDColumnSEXPSEXP);
+    rcpp_result_gen = Rcpp::wrap(RichCluster_cpp_wrapper_function(distanceMetricSEXP, distanceCutoffSEXP, linkageMethodSEXP, linkageCutoffSEXP, termNameColumnSEXP, geneIDColumnSEXP));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -43,7 +43,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_RichCluster_RichCluster", (DL_FUNC) &_RichCluster_RichCluster, 6},
+    {"_RichCluster_RichCluster_cpp_wrapper_function", (DL_FUNC) &_RichCluster_RichCluster_cpp_wrapper_function, 6},
     {"_RichCluster_ComputeDistanceMatrix", (DL_FUNC) &_RichCluster_ComputeDistanceMatrix, 5},
     {NULL, NULL, 0}
 };

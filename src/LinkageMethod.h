@@ -18,7 +18,7 @@ public:
       const std::unordered_set<int>& cluster2
   );
   double getThreshold() {return _linkageThreshold;};
-  void loadDistanceFunction(std::function<double(int, int)> distFct) {distanceFunction = distFct};
+  void loadDistanceFunction(std::function<double(int, int)> distFct) {distanceFunction = distFct;}
 
 private:
   std::string _linkageMethod;

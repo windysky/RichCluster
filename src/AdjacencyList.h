@@ -7,7 +7,7 @@
 
 class AdjacencyList {
 public:
-  AdjacencyList::AdjacencyList(int nterms) : _nterms(nterms)
+  AdjacencyList(int nterms) : _nterms(nterms) {}
 
   void addNeighbor(int node, int neighbor);
   bool hasNeighbor(int node, int neighbor);

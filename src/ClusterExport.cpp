@@ -1,5 +1,6 @@
 #include <Rcpp.h>
 #include "RichCluster.h"
+#include "ClusterManager.h" // Added include
 #include "DistanceMetric.h"
 #include "LinkageMethod.h"
 #include <string>
@@ -45,10 +46,11 @@ Rcpp::List RichCluster(std::string distanceMetric, double distanceCutoff,
                        Rcpp::CharacterVector termNameColumn,
                        Rcpp::CharacterVector geneIDColumn) {
 
-  RichCluster CM(termNameColumn,geneIDColumn);
-  DistanceMetric DM(distanceMetric, distanceCutoff);
+  DistanceMetric dm_obj(distanceMetric, distanceCutoff); // Renamed DM to dm_obj for clarity
+  LinkageMethod lm_obj(linkageMethod, linkageCutoff);   // Create LinkageMethod with correct constructor
+  RichCluster CM(termNameColumn, geneIDColumn, dm_obj, lm_obj); // Corrected constructor call
 
-  CM.calculateDistanceScores(DM);
+  CM.computeDistances(); // Replaced calculateDistanceScores
 
   /* MergeStrategy requires the following parameters:
       std::string mergeStrategy, (ex: "DAVID")
@@ -56,16 +58,17 @@ Rcpp::List RichCluster(std::string distanceMetric, double distanceCutoff,
       std::string membershipStrategy, (ex: "DAVID")
       double membershipCutoff, (0-1)
   */
-  LinkageMethod MS("DAVID", 0.5, "DAVID", membershipCutoff);
-  CM.filterSeeds();
-  Rcpp::DataFrame FilteredSeedMap = CM.exportR_SeedMap();
-  CM.mergeSeeds(MS);
+  // LinkageMethod MS("DAVID", 0.5, "DAVID", membershipCutoff); 
+  CM.filterSeeds(); // Ensure this is present
+  // Rcpp::DataFrame FilteredSeedMap = CM.exportR_SeedMap();
+  CM.mergeClusters(); // Replaced mergeSeeds(MS)
   // return Rcpp::List::create(
   //   Rcpp::_["DistanceMatrix"] = CM.exportR_DistanceMatrix(),
   //   Rcpp::_["SeedMap"] = CM.exportR_SeedMap(),
   //   Rcpp::_["FilteredSeeds"] = FilteredSeedMap,
   //   Rcpp::_["MergedSeeds"] = CM.exportR_ClusterList()
   // );
+  // Ensure the return statement matches the requirement (it already does from previous state)
   return Rcpp::List::create(
     Rcpp::_["distance_matrix"] = CM.exportR_DistanceMatrix(),
     Rcpp::_["all_clusters"] = CM.exportR_ClusterList()

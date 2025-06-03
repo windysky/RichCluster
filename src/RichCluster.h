@@ -25,7 +25,7 @@ public:
 
   std::function<double(int, int)> distanceFunction() {
     return [this](int i, int j) {
-      return _distanceMatrix.getDistance(i, j);
+      return distanceMatrix.getDistance(i, j);
     };
   }
 
@@ -39,7 +39,7 @@ public:
 
 private:
   std::unordered_set<int> filterSeed(int root, const std::unordered_set<int>& neighbors);
-  ClusterList::ClusterIt RichCluster::findBestMergePartner(
+  ClusterList::ClusterIt findBestMergePartner(
       ClusterList::ClusterIt it1, std::list<std::unordered_set<int>>& clusters
   );
 

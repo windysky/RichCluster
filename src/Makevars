@@ -1,11 +1,13 @@
 # List all source files
-SOURCES=ClusterExport.cpp ClusterList.cpp ClusterManager.cpp DistanceMatrix.cpp DistanceMetric.cpp MergeStrategy.cpp RcppExports.cpp SeedMap.cpp StringUtils.cpp
+SOURCES=$(wildcard *.cpp)
 
 # Define objects from sources
-OBJECTS=ClusterExport.o ClusterList.o ClusterManager.o DistanceMatrix.o DistanceMetric.o MergeStrategy.o RcppExports.o SeedMap.o StringUtils.o
+OBJECTS=$(SOURCES:.cpp=.o)
 
 # Add additional flags if needed
 PKG_CPPFLAGS=-I.
+
+CXX_STD = CXX11
 
 # Define the rule for making the shared library
 all: $(SHLIB)

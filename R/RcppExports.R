@@ -36,8 +36,8 @@
 #' all_clusters <- result$all_clusters
 #'
 #' @export
-RichCluster <- function(distanceMetric, distanceCutoff, mergeStrategy, membershipCutoff, termNameColumn, geneIDColumn, PvalueColumn) {
-    .Call(`_RichCluster_RichCluster`, distanceMetric, distanceCutoff, mergeStrategy, membershipCutoff, termNameColumn, geneIDColumn, PvalueColumn)
+RichCluster <- function(distanceMetric, distanceCutoff, linkageMethod, linkageCutoff, termNameColumn, geneIDColumn) {
+    .Call(`_RichCluster_RichCluster`, distanceMetric, distanceCutoff, linkageMethod, linkageCutoff, termNameColumn, geneIDColumn)
 }
 
 #' @name ComputeDistanceMatrix

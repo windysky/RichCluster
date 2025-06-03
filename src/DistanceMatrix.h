@@ -3,6 +3,7 @@
 
 #include <Rcpp.h>
 #include <vector>
+#include <functional>
 
 
 class DistanceMatrix {

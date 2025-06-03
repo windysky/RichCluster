@@ -2,47 +2,28 @@
 #define CLUSTERLIST_H
 
 #include "SeedMap.h"
-#include "MergeStrategy.h"
+#include "LinkageMethod.h"
 #include "DistanceMatrix.h"
 #include <list>
 #include <unordered_set>
 
-// Class for creating and merging clusters in place
-class ClusterList {
+class ClusterList{
 public:
-  // Constructor initializes and filters at same time
-  // Maybe in future, can pass in R dataframe (maybe method of seedMap tho)
-  ClusterList(SeedMap& seedMap, DistanceMatrix& DM)
-    : _seedMap(seedMap), 
-      _distanceMatrix(DM),
-      _distanceFunction([&DM](int a, int b) { return DM.getDistance(a, b); }
-  ) {};
-  
-  // Filters 'seeds' (initial cluster groups) in place based on if their members 
-  // are above some defined membership cutoff (for a given strategy)
-  // (Also used to fill clusterList with values if none exist yet)
-  void filterSeeds(MergeStrategy MS);
-  
-  /*
-  Keeps merging clusters in place until no more merges can be made,
-  meaning all possible merges will result in 
-  MergePartner.mergeScore < membershipCutoff for all possible combinations
-   */
-  void mergeClusters(MergeStrategy MS);
-  
-  struct MergePartner {
-    int clusterNumber;
-    double mergeScore;
-  };
-  
-  MergePartner getBestMergePartner(const MergePartner& partner);
-  Rcpp::DataFrame export_RDataFrame(); // R conversion util
-  
+  using Cluster = std::unordered_set<int>;
+  using ClusterIt = std::list<Cluster>::iterator;
+
+  ClusterList() {};
+  void addCluster(Cluster cluster) {clusterList.push_back(cluster)};
+  void removeCluster(ClusterIt it) {clusterList.erase(it)};
+  void mergeClusters(ClusterIt it1, ClusterIt it2) {
+    if (it1 == it2) return;
+    it1->insert(it2->begin(), it2->end());
+    clusterList.erase(it2);
+  }
+  std::list<Cluster>& getList() {return clusterList};
+
 private:
   std::list<std::unordered_set<int>> clusterList;
-  SeedMap& _seedMap;
-  DistanceMatrix& _distanceMatrix;
-  std::function<double(int, int)> _distanceFunction;
-};
+}
 
 #endif

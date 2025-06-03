@@ -52,8 +52,8 @@ cluster <- function(enrichment_results, df_names=NULL, min_terms=5, min_value=0.
   geneID_vec <- merged_df$GeneID
   padj_vec <- merged_df$Padj
 
-  merged_df <- merged_df magrittr::%>%
-    dplyr::filter(Pvalue < min_value) # as default, but user adjusts if they want
+  merged_df <- merged_df %>%
+    filter(Pvalue < min_value) # as default, but user adjusts if they want
 
   # throw error if cluster options are invalid
 
@@ -115,7 +115,7 @@ validate_inputs <- function(enrichment_results, df_names=NA_character_,
 #' Filters the full list of clusters by keeping only those with greater
 #' than or equal to min_terms # of terms.
 #'
-#' @param all_clusters A dataframe containing the merged seeds, typically the `all_clusters` element from the main clustering result. It should have a column named `TermIndices` (or similar, representing term members) and `Cluster` (identifying the cluster).
+#' @param full_clusters A dataframe containing the merged seeds with column named `ClusterIndices`.
 #' @param min_terms An integer specifying the minimum number of terms required in a cluster.
 #'
 #' @return The filtered data frame with clusters filtered to include only those with at least `min_terms` terms.
@@ -123,14 +123,14 @@ validate_inputs <- function(enrichment_results, df_names=NA_character_,
 #' @export
 filter_clusters <- function(all_clusters, min_terms)
 {
-  filtered_clusters <- all_clusters magrittr::%>%
-    dplyr::mutate(row_id = dplyr::row_number()) magrittr::%>%  # Add a row identifier
-    tidyr::separate_rows(TermIndices, sep = ", ") magrittr::%>%  # Separate into individual rows
-    dplyr::group_by(row_id, Cluster) magrittr::%>%  # Group by the original rows
-    dplyr::filter(dplyr::n() >= min_terms) magrittr::%>%  # Filter groups with at least X terms
-    dplyr::summarise(TermIndices = paste(TermIndices, collapse = ", ")) magrittr::%>%  # Collapse back to single strings
-    dplyr::ungroup() magrittr::%>%  # Ungroup to finalize the data frame
-    dplyr::select(-row_id)  # Remove the temporary row identifier
+  filtered_clusters <- all_clusters %>%
+    mutate(row_id = row_number()) %>%  # Add a row identifier
+    separate_rows(TermIndices, sep = ", ") %>%  # Separate into individual rows
+    group_by(row_id, Cluster) %>%  # Group by the original rows
+    dplyr::filter(n() >= min_terms) %>%  # Filter groups with at least X terms
+    summarise(TermIndices = paste(TermIndices, collapse = ", ")) %>%  # Collapse back to single strings
+    ungroup() %>%  # Ungroup to finalize the data frame
+    select(-row_id)  # Remove the temporary row identifier
 
   return(filtered_clusters)
 }

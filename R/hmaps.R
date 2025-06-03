@@ -1,4 +1,5 @@
 # heatmap creation
+library(dplyr)
 
 # utils
 na_to_zero <- function(x) {
@@ -24,8 +25,6 @@ na_to_zero <- function(x) {
 #'   Defaults to `"Padj"`.
 #' @param aggr_type A function used to aggregate values across clusters (e.g., `mean` or `median`).
 #'   Defaults to `mean`.
-#' @param title Optional. A character string for the plot title. If NULL, a default
-#'              title is generated.
 #'
 #' @return An interactive heatmap object (`plotly`), displaying the -log10(Padj) values
 #'   across clusters, with representative terms as row labels.
@@ -48,23 +47,23 @@ cluster_hmap <- function(cluster_result, clusters=NULL, value_type="Padj", aggr_
   cluster_df <- cluster_result$cluster_df
 
   # hmap_matrix
-  hmap_matrix <- cluster_df magrittr::%>%
-    dplyr::group_by(Cluster) magrittr::%>%
-    dplyr::summarise(dplyr::across(dplyr::starts_with(paste0(value_type, "_")), function(x) mean(x, na.rm=TRUE))) magrittr::%>%
-    # dplyr::mutate(dplyr::across(dplyr::where(is.numeric), na_to_zero)) magrittr::%>%
-    dplyr::select(-Cluster) magrittr::%>% # remove (don't wanna plot her)
-    dplyr::mutate(dplyr::across(dplyr::where(is.numeric), function(x) -log10(x))) magrittr::%>%
-    dplyr::mutate(dplyr::across(dplyr::where(is.numeric), function(x) ifelse(is.infinite(x), 0, x))) magrittr::%>%
+  hmap_matrix <- cluster_df %>%
+    group_by(Cluster) %>%
+    summarise(across(starts_with(paste0(value_type, "_")), function(x) mean(x, na.rm=TRUE))) %>%
+    # mutate(across(where(is.numeric), na_to_zero)) %>%
+    select(-Cluster) %>% # remove (don't wanna plot her)
+    mutate(across(where(is.numeric), function(x) -log10(x))) %>%
+    mutate(across(where(is.numeric), function(x) ifelse(is.infinite(x), 0, x))) %>%
     as.matrix()
 
   # representative term making
   # use the Pvalue/Padj average column
-  representative_terms <- cluster_df magrittr::%>%
-    dplyr::group_by(Cluster) magrittr::%>%
-    dplyr::filter(!!rlang::sym(value_type) == min(!!rlang::sym(value_type), na.rm=TRUE)) magrittr::%>%
-    dplyr::slice(1) magrittr::%>%
-    dplyr::ungroup() magrittr::%>%
-    dplyr::pull(Term)
+  representative_terms <- cluster_df %>%
+    group_by(Cluster) %>%
+    filter(value_type==min(value_type, na.rm=TRUE)) %>%
+    slice(1) %>%
+    ungroup %>%
+    pull(Term)
   rownames(hmap_matrix) <- representative_terms
   colnames(hmap_matrix) <- cluster_result$df_names
 
@@ -138,17 +137,17 @@ term_hmap <- function(cluster_result, clusters, terms, value_type, aggr_type, ti
   }  else if (is.character(clusters)) {
     # --- representative term search ---
     # user supplied terms -> get cluster numbers
-    clusters <- cluster_df magrittr::%>%
-      dplyr::filter(Term %in% clusters) magrittr::%>%
-      dplyr::pull(Cluster) magrittr::%>%
+    clusters <- cluster_df %>%
+      filter(Term %in% clusters) %>%
+      pull(Cluster) %>%
       unique()
   } else {
     stop("`clusters` must be either numeric (cluster #s) or character (term names).")
   }
   # use cluster numbers to get all terms in specified clusters
-  cluster_terms <- cluster_df magrittr::%>%
-    dplyr::filter(Cluster %in% clusters) magrittr::%>%
-    dplyr::select(Cluster, Term, dplyr::starts_with(paste0(value_type, "_")))
+  cluster_terms <- cluster_df %>%
+    filter(Cluster %in% clusters) %>%
+    select(Cluster, Term, starts_with(paste0(value_type, "_")))
 
   # search for specific terms if supplied
   if (is.null(terms)) {
@@ -157,32 +156,32 @@ term_hmap <- function(cluster_result, clusters, terms, value_type, aggr_type, ti
   } else if (!is.character(terms)) {
     stop("`terms` must be character (Term names).")
   } else {
-    specific_terms <- cluster_df magrittr::%>%
-      dplyr::filter(Term %in% terms) magrittr::%>%
-      dplyr::select(Cluster, Term, dplyr::starts_with(paste0(value_type, "_")))
+    specific_terms <- cluster_df %>%
+      filter(Term %in% terms) %>%
+      select(Cluster, Term, starts_with(paste0(value_type, "_")))
   }
 
   # get the UNION of all terms in specified clusters
   # and those specified by terms
-  final_terms <- dplyr::bind_rows(specific_terms, cluster_terms) magrittr::%>%
-    dplyr::distinct()
+  final_terms <- bind_rows(specific_terms, cluster_terms) %>%
+    distinct()
 
   # create the hmap_matrix
   # performing final value updates
-  hmap_matrix <- final_terms magrittr::%>%
-    dplyr::group_by(Cluster) magrittr::%>%
-    # dplyr::mutate(dplyr::across(dplyr::where(is.numeric), na_to_zero)) magrittr::%>%
-    # dplyr::select(-Cluster) magrittr::%>% # remove (don't wanna plot her)
-    dplyr::mutate(dplyr::across(dplyr::where(is.numeric), function(x) -log10(x))) magrittr::%>%
-    dplyr::mutate(dplyr::across(dplyr::where(is.numeric), function(x) ifelse(is.infinite(x), 0, x)))
+  hmap_matrix <- final_terms %>%
+    group_by(Cluster) %>%
+    # mutate(across(where(is.numeric), na_to_zero)) %>%
+    # select(-Cluster) %>% # remove (don't wanna plot her)
+    mutate(across(where(is.numeric), function(x) -log10(x))) %>%
+    mutate(across(where(is.numeric), function(x) ifelse(is.infinite(x), 0, x)))
 
   # keep these vars for labeling
   cluster_annots <- hmap_matrix$Cluster
   row_names <- hmap_matrix$Term
 
-  hmap_matrix <- hmap_matrix magrittr::%>%
-    dplyr::ungroup() magrittr::%>%
-    dplyr::select(dplyr::starts_with(paste0(value_type, "_"))) magrittr::%>%
+  hmap_matrix <- hmap_matrix %>%
+    ungroup() %>%
+    select(starts_with(paste0(value_type, "_"))) %>%
     as.matrix()
   rownames(hmap_matrix) <- row_names
   colnames(hmap_matrix) <- cluster_result$df_names
@@ -197,10 +196,10 @@ term_hmap <- function(cluster_result, clusters, terms, value_type, aggr_type, ti
   h <- iheatmapr::main_heatmap(
     hmap_matrix,
     name=paste0("-log10(", value_type, ")")
-  ) magrittr::%>%
-    iheatmapr::add_row_title("Term") magrittr::%>%
-    iheatmapr::add_col_title(title, side=c("top")) magrittr::%>%
-    iheatmapr::add_col_title("Enrichment Result", side=c("bottom")) magrittr::%>%
+  ) %>%
+    iheatmapr::add_row_title("Term") %>%
+    iheatmapr::add_col_title(title, side=c("top")) %>%
+    iheatmapr::add_col_title("Enrichment Result", side=c("bottom")) %>%
     iheatmapr::add_row_annotation(data.frame("Cluster"=cluster_annots))
 
 

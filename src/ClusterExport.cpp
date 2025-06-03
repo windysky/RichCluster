@@ -1,7 +1,7 @@
 #include <Rcpp.h>
-#include "ClusterManager.h"
+#include "RichCluster.h"
 #include "DistanceMetric.h"
-#include "MergeStrategy.h"
+#include "LinkageMethod.h"
 #include <string>
 
 //' @name RichCluster
@@ -41,12 +41,11 @@
 //' @export
 // [[Rcpp::export]]
 Rcpp::List RichCluster(std::string distanceMetric, double distanceCutoff,
-                       std::string mergeStrategy, double membershipCutoff,
+                       std::string linkageMethod, double linkageCutoff,
                        Rcpp::CharacterVector termNameColumn,
-                       Rcpp::CharacterVector geneIDColumn,
-                       Rcpp::NumericVector PvalueColumn) {
+                       Rcpp::CharacterVector geneIDColumn) {
 
-  ClusterManager CM(termNameColumn,geneIDColumn, PvalueColumn);
+  RichCluster CM(termNameColumn,geneIDColumn);
   DistanceMetric DM(distanceMetric, distanceCutoff);
 
   CM.calculateDistanceScores(DM);
@@ -57,8 +56,8 @@ Rcpp::List RichCluster(std::string distanceMetric, double distanceCutoff,
       std::string membershipStrategy, (ex: "DAVID")
       double membershipCutoff, (0-1)
   */
-  MergeStrategy MS("DAVID", 0.5, "DAVID", membershipCutoff);
-  CM.filterSeeds(MS);
+  LinkageMethod MS("DAVID", 0.5, "DAVID", membershipCutoff);
+  CM.filterSeeds();
   Rcpp::DataFrame FilteredSeedMap = CM.exportR_SeedMap();
   CM.mergeSeeds(MS);
   // return Rcpp::List::create(

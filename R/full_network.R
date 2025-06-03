@@ -22,7 +22,7 @@ full_network <- function(cluster_result) {
     Group = "group",
     opacity = 0.9,
     linkWidth = 1.5,
-    linkDistance =  htmltools::JS("function(d) { return d.value * 50; }"),  # Adjust link distance based on value
+    linkDistance =  networkD3::JS("function(d) { return d.value * 50; }"),  # Adjust link distance based on value
     charge = -200,
     fontFamily = "arial",
     zoom = TRUE

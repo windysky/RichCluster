@@ -1,3 +1,6 @@
+library(dplyr)
+library(tidyverse)
+
 #' Merge List of Enrichment Results
 #'
 #' This function merges multiple enrichment results ('enrichment_results') into a single dataframe by
@@ -48,27 +51,13 @@ merge_enrichment_results <- function(enrichment_results) {
   })
 
   # Average the value columns across all enrichment_results
+  # Avg Pvalue
   pvalue_cols <- paste("Pvalue", seq_along(enrichment_results), sep=SEP)
+  merged_gs$Pvalue <- rowMeans(merged_gs[, pvalue_cols], na.rm=TRUE)
+
+  # Avg Padj
   padj_cols <- paste("Padj", seq_along(enrichment_results), sep=SEP)
-
-  # Calculate Padj first. It might be used as a fallback for Pvalue.
-  if (all(padj_cols %in% colnames(merged_gs))) {
-    merged_gs$Padj <- rowMeans(merged_gs[, padj_cols, drop = FALSE], na.rm=TRUE)
-  } else {
-    # If original Padj columns are not found, Padj cannot be calculated.
-    # Set to NA or handle as an error if Padj is critical.
-    merged_gs$Padj <- NA 
-  }
-
-  # Calculate Pvalue.
-  # If Pvalue_X columns exist, use them. Otherwise, use the calculated Padj.
-  if (all(pvalue_cols %in% colnames(merged_gs))) {
-    merged_gs$Pvalue <- rowMeans(merged_gs[, pvalue_cols, drop = FALSE], na.rm=TRUE)
-  } else {
-    # If Pvalue_X columns are not found, use Padj as Pvalue.
-    # This relies on Padj being calculated in the step above.
-    merged_gs$Pvalue <- merged_gs$Padj
-  }
+  merged_gs$Padj <- rowMeans(merged_gs[, padj_cols], na.rm=TRUE)
 
   # Return the merged geneset df
   return(merged_gs)

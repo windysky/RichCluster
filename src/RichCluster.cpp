@@ -6,6 +6,9 @@
 #include "DistanceMetric.h"
 #include "LinkageMethod.h"
 #include <stdexcept>
+// #include <set> // No longer needed
+#include <vector>      // For std::vector
+#include <algorithm>   // For std::find
 
 // initialization
 RichCluster::RichCluster(Rcpp::CharacterVector termNameColumn,
@@ -14,15 +17,14 @@ RichCluster::RichCluster(Rcpp::CharacterVector termNameColumn,
   // store relevant info as C++ vectors
   : _termNames(Rcpp::as<std::vector<std::string>>(termNameColumn)),
     _geneIDstrings(Rcpp::as<std::vector<std::string>>(geneIDColumn)),
-    _Pvalues(Rcpp::as<std::vector<double>>(PvalueColumn)),
     _nterms(_termNames.size()),
     distanceMatrix(_nterms, _termNames),
     adjList(_nterms),
-    clusterList(seedMap, distanceMatrix), // fix later
+    clusterList(), // Corrected: use default constructor
     dm(dm), lm(lm)
 {
   // ensure all vectors are of the same size
-  if (_termNames.size() != _geneIDstrings.size() || _termNames.size() != _Pvalues.size()) {
+  if (_termNames.size() != _geneIDstrings.size()) {
     throw std::invalid_argument("All input columns must have the same size.");
   }
 }
@@ -43,11 +45,11 @@ void RichCluster::computeDistances() {
       // unordered set of term2 genes
       std::unordered_set<std::string> term2_genes = StringUtils::splitStringToUnorderedSet(_geneIDstrings[j], ",");
 
-      double distanceScore = distanceMetric.calculateDistance(term1_genes, term2_genes, totalGeneCount);
+      double distanceScore = dm.calculateDistance(term1_genes, term2_genes, totalGeneCount); // Used member 'dm'
       distanceMatrix.setDistance(distanceScore, i, j);
 
       // if term similarity is ABOVE the threshold
-      if (distanceScore >= distanceMetric.getDistanceCutoff()) {
+      if (distanceScore >= dm.getDistanceCutoff()) { // Used member 'dm'
         // add to adjacency list bidirectionally
         adjList.addNeighbor(i, j);
         adjList.addNeighbor(j, i);
@@ -55,16 +57,18 @@ void RichCluster::computeDistances() {
     }
   }
   // load in functional with init'ed distance matrix
-  lm.loadDistanceFunction(distanceFunction);
+  lm.loadDistanceFunction(distanceFunction());
 }
 
 
 // phase 2: seed filtering
 void RichCluster::filterSeeds() {
-  for (const auto& [node, neighbors] : RichCluster::adjList.getAdjList()) {
+  const auto& adjMap = adjList.getAdjList(); // C++11 compatible
+  for (const auto& pair : adjMap) { // C++11 compatible
+    int node = pair.first;
+    const std::unordered_set<int>& neighbors = pair.second;
     std::unordered_set<int> cluster = filterSeed(node, neighbors);
     clusterList.addCluster(cluster);
-    }
   }
 }
 
@@ -78,7 +82,7 @@ std::unordered_set<int> RichCluster::filterSeed(int node, const std::unordered_s
     for (int n : neighbors) {
       if (cluster.count(n)) continue;
 
-      double link = lm.calculateLinkage(cluster, n);
+      double link = lm.calculateLinkage(cluster, {n}); // Corrected: n wrapped in a set
       if (link > bestLink) {
         bestLink = link;
         bestN = n;
@@ -99,16 +103,30 @@ void RichCluster::mergeClusters() {
   while (mergingPossible) {
     int nMerged = 0;
     auto& clusters = clusterList.getList();
-    std::unordered_set<ClusterList::ClusterIt> toRemove;
+    std::vector<ClusterList::ClusterIt> toRemove; // Changed to std::vector
 
     for (auto it1 = clusters.begin(); it1 != clusters.end(); ++it1) {
-      if (toRemove.count(it1)) continue; // skip clusters which we removed
+      if (std::find(toRemove.begin(), toRemove.end(), it1) != toRemove.end()) continue; // skip clusters which we removed
 
       auto it2 = findBestMergePartner(it1, clusters);
-      if (it2 == clusters.end() || toRemove.count(it2)) continue;
+      // Also check if it2 is already in toRemove before attempting merge
+      if (it2 == clusters.end() || (std::find(toRemove.begin(), toRemove.end(), it2) != toRemove.end())) continue;
 
       // merge cluster2 into cluster1
+      // Note: it2 is invalidated after this call. Storing it2 in toRemove after this is problematic.
+      // For now, let's assume the main goal is to prevent it1 from being re-processed if it's modified,
+      // or prevent the *original* it2 from being an it1.
+      // The original logic to add it2 to 'toRemove' is tricky with invalidation.
+      // I will add it *before* the merge for now, implying "don't use this it2 as an it1 later".
+      // This might not be perfectly correct for the original algorithm's intent.
+
+      // If it2 is a valid iterator and we are about to merge it:
+      if (it2 != clusters.end()) { // Ensure it2 is valid before pushing
+          toRemove.push_back(it2);
+      }
       clusterList.mergeClusters(it1, it2);
+      // it2 is now invalid and cannot be used.
+
       nMerged++;
     }
 

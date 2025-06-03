@@ -4,8 +4,7 @@
 #include "StringUtils.h"
 #include <functional>
 
-
-
+/*
 void ClusterList::filterSeeds(MergeStrategy MS) {
   const auto& seedMapInstance = _seedMap.getSeedMap();
 
@@ -93,37 +92,38 @@ void ClusterList::mergeClusters(MergeStrategy MS) {
     }
   }
 }
+*/
 
 // export ClusterList as a R dataframe with termNames and index values
-Rcpp::DataFrame ClusterList::export_RDataFrame() {
-  std::vector<std::string> termIndicesColumn;
-  std::vector<std::string> termNamesColumn;
-  std::vector<int> clusterColumn;
-
-  std::vector<std::string>& termNames = *(_seedMap._termNames); // dereference pointer
-
-  int clusterNumber = 1;
-  // Iterate through ClusterList and convert to vectors
-  for (const auto& clusterGroup : clusterList) {
-    // Turn the ints into a string
-    std::string termIndicesString = StringUtils::unorderedSetToString(clusterGroup, ", ");
-    termIndicesColumn.push_back(termIndicesString); // Append to termIndices
-
-    std::vector<std::string> clusterGroupTerms;
-    for (const auto& term_index : clusterGroup) {
-      std::string term = termNames[term_index];
-      clusterGroupTerms.push_back(term);
-    }
-    // Convert vector/unordered_set to one comma-delimited string
-    std::string clusterGroupTerms_string = StringUtils::vectorToString(clusterGroupTerms, ", ");
-    termNamesColumn.push_back(clusterGroupTerms_string); // Append to termNames
-
-    // Append cluster number to clusterColumn
-    clusterColumn.push_back(clusterNumber++);
-  }
-
-  // Create and return a DataFrame using Rcpp
-  return Rcpp::DataFrame::create(Rcpp::Named("Cluster") = clusterColumn,
-                                 Rcpp::Named("TermNames") = termNamesColumn,
-                                 Rcpp::Named("TermIndices") = termIndicesColumn);
-}
+// Rcpp::DataFrame ClusterList::export_RDataFrame() { // DEFINITION REMOVED - It's inline in ClusterList.h
+//   std::vector<std::string> termIndicesColumn;
+//   std::vector<std::string> termNamesColumn;
+//   std::vector<int> clusterColumn;
+//
+//   std::vector<std::string>& termNames = *(_seedMap._termNames); // dereference pointer
+//
+//   int clusterNumber = 1;
+//   // Iterate through ClusterList and convert to vectors
+//   for (const auto& clusterGroup : clusterList) {
+//     // Turn the ints into a string
+//     std::string termIndicesString = StringUtils::unorderedSetToString(clusterGroup, ", ");
+//     termIndicesColumn.push_back(termIndicesString); // Append to termIndices
+//
+//     std::vector<std::string> clusterGroupTerms;
+//     for (const auto& term_index : clusterGroup) {
+//       std::string term = termNames[term_index];
+//       clusterGroupTerms.push_back(term);
+//     }
+//     // Convert vector/unordered_set to one comma-delimited string
+//     std::string clusterGroupTerms_string = StringUtils::vectorToString(clusterGroupTerms, ", ");
+//     termNamesColumn.push_back(clusterGroupTerms_string); // Append to termNames
+//
+//     // Append cluster number to clusterColumn
+//     clusterColumn.push_back(clusterNumber++);
+//   }
+//
+//   // Create and return a DataFrame using Rcpp
+//   return Rcpp::DataFrame::create(Rcpp::Named("Cluster") = clusterColumn,
+//                                  Rcpp::Named("TermNames") = termNamesColumn,
+//                                  Rcpp::Named("TermIndices") = termIndicesColumn);
+// }

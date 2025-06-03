@@ -1,9 +1,9 @@
-// [[Rcpp::depends(Rcpp)]]
+// Restoring the Rcpp-exported functions
 #include <Rcpp.h>
 #include "RichCluster.h"
-#include "ClusterManager.h" // Added include
-#include "DistanceMetric.h"
-#include "LinkageMethod.h"
+#include "ClusterManager.h" // Needed for ComputeDistanceMatrix
+#include "DistanceMetric.h" // Needed for ComputeDistanceMatrix (and RichCluster via dm_obj)
+#include "LinkageMethod.h"  // Needed for RichCluster (via lm_obj)
 #include <string>
 
 // [[Rcpp::export]]
@@ -16,71 +16,36 @@ Rcpp::List toyListExample() {
 }
 
 //' @name RichCluster
-//'
-//' This function clusters terms within an enrichment result with based on gene
-//' similarity using specified distance metrics and merging strategies. It
-//' integrates the following steps:
-//' \enumerate{
-//'   \item{Initializes a ClusterManager with input gene data.}
-//'   \item{Calculates distance scores using the specified distance metric and cutoff.}
-//'   \item{Filters seeds based on the provided merging strategy and membership cutoff.}
-//'   \item{Merges seeds based on the merging strategy.}
-//' }
-//'
-//' @param distanceMetric A string specifying the distance metric to use (e.g., "kappa").
-//' @param distanceCutoff A double specifying the distance cutoff value.
-//' @param mergeStrategy A string specifying the merge strategy to use (e.g., "DAVID").
-//' @param membershipCutoff A double specifying the membership cutoff value (between 0 and 1).
-//' @param termNameColumn A CharacterVector containing term names.
-//' @param geneIDColumn A CharacterVector containing gene IDs.
-//' @param PvalueColumn A NumericVector containing p-values.
-//'
-//' @return An R List object containing the following elements:
-//' \itemize{
-//'   \item{DistanceMatrix: The distance matrix used in clustering.}
-//'   \item{SeedMap: The initial seed map of clusters.}
-//'   \item{FilteredSeeds: The filtered seed map after applying the merge strategy.}
-//'   \item{MergedSeeds: The final cluster list after merging seeds.}
-//' }
-//'
-//' @examples
-//' # Example usage
-//' result <- RichCluster("kappa", 0.5, "DAVID", 0.7, termNames, geneIDs, pValues)
-//' distanceMatrix <- result$distance_matrix
-//' all_clusters <- result$all_clusters
-//'
 //' @export
-// [[Rcpp::export]]
-Rcpp::List RunRichCluster(std::string distanceMetric, double distanceCutoff,
-                       std::string linkageMethod, double linkageCutoff,
-                       Rcpp::CharacterVector termNameColumn,
-                       Rcpp::CharacterVector geneIDColumn) {
 
-  DistanceMetric dm_obj(distanceMetric, distanceCutoff); // Renamed DM to dm_obj for clarity
-  LinkageMethod lm_obj(linkageMethod, linkageCutoff);   // Create LinkageMethod with correct constructor
-  
-  // Now “RichCluster” unambiguously refers to the class, not the function.
-  RichCluster CM(termNameColumn, geneIDColumn, dm_obj, lm_obj);
+// [[Rcpp::export(RichCluster)]] // Keep R function name as RichCluster
+Rcpp::List RichCluster_cpp_wrapper_function(SEXP distanceMetricSEXP, SEXP distanceCutoffSEXP, // Renamed C++ function
+                       SEXP linkageMethodSEXP, SEXP linkageCutoffSEXP,
+                       SEXP termNameColumnSEXP, SEXP geneIDColumnSEXP) {
 
-  CM.computeDistances(); // Replaced calculateDistanceScores
+  // Uncomment conversions from SEXP
+  std::string distanceMetric = Rcpp::as<std::string>(distanceMetricSEXP);
+  double distanceCutoff = Rcpp::as<double>(distanceCutoffSEXP);
+  std::string linkageMethod = Rcpp::as<std::string>(linkageMethodSEXP);
+  double linkageCutoff = Rcpp::as<double>(linkageCutoffSEXP);
+  Rcpp::CharacterVector termNameColumn = Rcpp::as<Rcpp::CharacterVector>(termNameColumnSEXP);
+  Rcpp::CharacterVector geneIDColumn = Rcpp::as<Rcpp::CharacterVector>(geneIDColumnSEXP);
 
-  /* MergeStrategy requires the following parameters:
-      std::string mergeStrategy, (ex: "DAVID")
-      double mergeCutoff, (0-1)
-      std::string membershipStrategy, (ex: "DAVID")
-      double membershipCutoff, (0-1)
-  */
-  // LinkageMethod MS("DAVID", 0.5, "DAVID", membershipCutoff);
-  CM.filterSeeds(); // Ensure this is present
-  // Rcpp::DataFrame FilteredSeedMap = CM.exportR_SeedMap();
-  CM.mergeClusters(); // Replaced mergeSeeds(MS)
-  // return Rcpp::List::create(
-  //   Rcpp::_["DistanceMatrix"] = CM.exportR_DistanceMatrix(),
-  //   Rcpp::_["SeedMap"] = CM.exportR_SeedMap(),
-  //   Rcpp::_["FilteredSeeds"] = FilteredSeedMap,
-  //   Rcpp::_["MergedSeeds"] = CM.exportR_ClusterList()
-  // );
-  // Ensure the return statement matches the requirement (it already does from previous state)
+  // Remove internal mocks
+  // Rcpp::CharacterVector mockTermNames;
+  // mockTermNames.push_back("MockTerm1");
+  // Rcpp::CharacterVector mockGeneIDs;
+  // mockGeneIDs.push_back("MockGene1");
+  DistanceMetric dm_obj(distanceMetric, distanceCutoff); // Use variables from SEXP parameters
+  LinkageMethod lm_obj(linkageMethod, linkageCutoff); // Use variables from SEXP parameters
+
+  RichCluster CM(termNameColumn, geneIDColumn, dm_obj, lm_obj); // Use variables from SEXP parameters
+
+
+  CM.computeDistances();
+  CM.filterSeeds();
+  CM.mergeClusters();
+
   return Rcpp::List::create(
     Rcpp::_["distance_matrix"] = CM.exportR_DistanceMatrix(),
     Rcpp::_["all_clusters"] = CM.exportR_ClusterList()
@@ -88,17 +53,6 @@ Rcpp::List RunRichCluster(std::string distanceMetric, double distanceCutoff,
 }
 
 //' @name ComputeDistanceMatrix
-//'
-//' This function computes a distance matrix based on gene similarity using a specified distance metric.
-//'
-//' @param distanceMetric A string specifying the distance metric to use (e.g., "kappa").
-//' @param distanceCutoff A double specifying the distance cutoff value.
-//' @param termNameColumn A CharacterVector containing term names.
-//' @param geneIDColumn A CharacterVector containing gene IDs.
-//' @param PvalueColumn A NumericVector containing p-values.
-//'
-//' @return A NumericMatrix containing the distance matrix.
-//'
 //' @export
 // [[Rcpp::export]]
 Rcpp::NumericMatrix ComputeDistanceMatrix(std::string distanceMetric, double distanceCutoff,

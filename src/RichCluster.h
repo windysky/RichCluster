@@ -4,6 +4,9 @@
 #include <Rcpp.h>
 #include <string>
 #include <functional>
+#include <vector>        // Added
+#include <unordered_set> // Added
+#include <list>          // Added
 #include "DistanceMetric.h"
 #include "DistanceMatrix.h"
 #include "AdjacencyList.h"

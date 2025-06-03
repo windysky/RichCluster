@@ -2,56 +2,12 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 #' @name RichCluster
-#'
-#' This function clusters terms within an enrichment result with based on gene
-#' similarity using specified distance metrics and merging strategies. It
-#' integrates the following steps:
-#' \enumerate{
-#'   \item{Initializes a ClusterManager with input gene data.}
-#'   \item{Calculates distance scores using the specified distance metric and cutoff.}
-#'   \item{Filters seeds based on the provided merging strategy and membership cutoff.}
-#'   \item{Merges seeds based on the merging strategy.}
-#' }
-#'
-#' @param distanceMetric A string specifying the distance metric to use (e.g., "kappa").
-#' @param distanceCutoff A double specifying the distance cutoff value.
-#' @param mergeStrategy A string specifying the merge strategy to use (e.g., "DAVID").
-#' @param membershipCutoff A double specifying the membership cutoff value (between 0 and 1).
-#' @param termNameColumn A CharacterVector containing term names.
-#' @param geneIDColumn A CharacterVector containing gene IDs.
-#' @param PvalueColumn A NumericVector containing p-values.
-#'
-#' @return An R List object containing the following elements:
-#' \itemize{
-#'   \item{DistanceMatrix: The distance matrix used in clustering.}
-#'   \item{SeedMap: The initial seed map of clusters.}
-#'   \item{FilteredSeeds: The filtered seed map after applying the merge strategy.}
-#'   \item{MergedSeeds: The final cluster list after merging seeds.}
-#' }
-#'
-#' @examples
-#' # Example usage
-#' result <- RichCluster("kappa", 0.5, "DAVID", 0.7, termNames, geneIDs, pValues)
-#' distanceMatrix <- result$distance_matrix
-#' all_clusters <- result$all_clusters
-#'
 #' @export
-RichCluster <- function(distanceMetric, distanceCutoff, linkageMethod, linkageCutoff, termNameColumn, geneIDColumn) {
-    .Call(`_RichCluster_RichCluster`, distanceMetric, distanceCutoff, linkageMethod, linkageCutoff, termNameColumn, geneIDColumn)
+RichCluster <- function(distanceMetricSEXP, distanceCutoffSEXP, linkageMethodSEXP, linkageCutoffSEXP, termNameColumnSEXP, geneIDColumnSEXP) {
+    .Call(`_RichCluster_RichCluster_cpp_wrapper_function`, distanceMetricSEXP, distanceCutoffSEXP, linkageMethodSEXP, linkageCutoffSEXP, termNameColumnSEXP, geneIDColumnSEXP)
 }
 
 #' @name ComputeDistanceMatrix
-#'
-#' This function computes a distance matrix based on gene similarity using a specified distance metric.
-#'
-#' @param distanceMetric A string specifying the distance metric to use (e.g., "kappa").
-#' @param distanceCutoff A double specifying the distance cutoff value.
-#' @param termNameColumn A CharacterVector containing term names.
-#' @param geneIDColumn A CharacterVector containing gene IDs.
-#' @param PvalueColumn A NumericVector containing p-values.
-#'
-#' @return A NumericMatrix containing the distance matrix.
-#'
 #' @export
 ComputeDistanceMatrix <- function(distanceMetric, distanceCutoff, termNameColumn, geneIDColumn, PvalueColumn) {
     .Call(`_RichCluster_ComputeDistanceMatrix`, distanceMetric, distanceCutoff, termNameColumn, geneIDColumn, PvalueColumn)

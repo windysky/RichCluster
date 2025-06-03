@@ -4,6 +4,7 @@
 #include "SeedMap.h"
 #include "LinkageMethod.h"
 #include "DistanceMatrix.h"
+#include <Rcpp.h> // Added for Rcpp::DataFrame
 #include <list>
 #include <unordered_set>
 
@@ -21,6 +22,7 @@ public:
     clusterList.erase(it2);
   }
   std::list<Cluster>& getList() {return clusterList;}
+  Rcpp::DataFrame export_RDataFrame() { return Rcpp::DataFrame(); } // Added method
 
 private:
   std::list<std::unordered_set<int>> clusterList;

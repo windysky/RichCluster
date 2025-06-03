@@ -58,7 +58,7 @@ Rcpp::List RichCluster(std::string distanceMetric, double distanceCutoff,
       std::string membershipStrategy, (ex: "DAVID")
       double membershipCutoff, (0-1)
   */
-  // LinkageMethod MS("DAVID", 0.5, "DAVID", membershipCutoff); 
+  // LinkageMethod MS("DAVID", 0.5, "DAVID", membershipCutoff);
   CM.filterSeeds(); // Ensure this is present
   // Rcpp::DataFrame FilteredSeedMap = CM.exportR_SeedMap();
   CM.mergeClusters(); // Replaced mergeSeeds(MS)

@@ -3,8 +3,10 @@
 
 #' @name RichCluster
 #' @export
-RichCluster <- function(distanceMetricSEXP, distanceCutoffSEXP, linkageMethodSEXP, linkageCutoffSEXP, termNameColumnSEXP, geneIDColumnSEXP) {
-    .Call(`_RichCluster_RichCluster_cpp_wrapper_function`, distanceMetricSEXP, distanceCutoffSEXP, linkageMethodSEXP, linkageCutoffSEXP, termNameColumnSEXP, geneIDColumnSEXP)
+NULL
+
+RunRichCluster <- function(distanceMetric, distanceCutoff, linkageMethod, linkageCutoff, termNameColumn, geneIDColumn) {
+    .Call(`_RichCluster_RunRichCluster`, distanceMetric, distanceCutoff, linkageMethod, linkageCutoff, termNameColumn, geneIDColumn)
 }
 
 #' @name ComputeDistanceMatrix

@@ -1,4 +1,4 @@
-// Restoring the Rcpp-exported functions
+// [[Rcpp::depends(Rcpp)]]
 #include <Rcpp.h>
 #include "RichCluster.h"
 #include "ClusterManager.h" // Needed for ComputeDistanceMatrix
@@ -6,41 +6,35 @@
 #include "LinkageMethod.h"  // Needed for RichCluster (via lm_obj)
 #include <string>
 
-// [[Rcpp::export]]
-Rcpp::List toyListExample() {
-  // Create a simple list with two elements: x = 42, y = "hello"
-  return Rcpp::List::create(
-    Rcpp::_["x"] = 42,
-    Rcpp::_["y"] = "hello"
-  );
-}
-
 //' @name RichCluster
 //' @export
 
-// [[Rcpp::export(RichCluster)]] // Keep R function name as RichCluster
-Rcpp::List RichCluster_cpp_wrapper_function(SEXP distanceMetricSEXP, SEXP distanceCutoffSEXP, // Renamed C++ function
-                       SEXP linkageMethodSEXP, SEXP linkageCutoffSEXP,
-                       SEXP termNameColumnSEXP, SEXP geneIDColumnSEXP) {
+// [[Rcpp::export]]
+Rcpp::List RunRichCluster(std::string distanceMetric, double distanceCutoff,
+                          std::string linkageMethod, double linkageCutoff,
+                          Rcpp::CharacterVector termNameColumn,
+                          Rcpp::CharacterVector geneIDColumn)  {
 
-  // Uncomment conversions from SEXP
-  std::string distanceMetric = Rcpp::as<std::string>(distanceMetricSEXP);
-  double distanceCutoff = Rcpp::as<double>(distanceCutoffSEXP);
-  std::string linkageMethod = Rcpp::as<std::string>(linkageMethodSEXP);
-  double linkageCutoff = Rcpp::as<double>(linkageCutoffSEXP);
-  Rcpp::CharacterVector termNameColumn = Rcpp::as<Rcpp::CharacterVector>(termNameColumnSEXP);
-  Rcpp::CharacterVector geneIDColumn = Rcpp::as<Rcpp::CharacterVector>(geneIDColumnSEXP);
+  // // Uncomment conversions from SEXP
+  // std::string distanceMetric = Rcpp::as<std::string>(distanceMetricSEXP);
+  // double distanceCutoff = Rcpp::as<double>(distanceCutoffSEXP);
+  // std::string linkageMethod = Rcpp::as<std::string>(linkageMethodSEXP);
+  // double linkageCutoff = Rcpp::as<double>(linkageCutoffSEXP);
+  // Rcpp::CharacterVector termNameColumn = Rcpp::as<Rcpp::CharacterVector>(termNameColumnSEXP);
+  // Rcpp::CharacterVector geneIDColumn = Rcpp::as<Rcpp::CharacterVector>(geneIDColumnSEXP);
 
   // Remove internal mocks
   // Rcpp::CharacterVector mockTermNames;
   // mockTermNames.push_back("MockTerm1");
   // Rcpp::CharacterVector mockGeneIDs;
   // mockGeneIDs.push_back("MockGene1");
+  
+  // Construct the helper objects exactly as the RichCluster constructor expects:
   DistanceMetric dm_obj(distanceMetric, distanceCutoff); // Use variables from SEXP parameters
   LinkageMethod lm_obj(linkageMethod, linkageCutoff); // Use variables from SEXP parameters
 
+  // Now “RichCluster” refers unambiguously to the C++ class, not an R wrapper.
   RichCluster CM(termNameColumn, geneIDColumn, dm_obj, lm_obj); // Use variables from SEXP parameters
-
 
   CM.computeDistances();
   CM.filterSeeds();

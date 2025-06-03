@@ -1,9 +1,19 @@
+// [[Rcpp::depends(Rcpp)]]
 #include <Rcpp.h>
 #include "RichCluster.h"
 #include "ClusterManager.h" // Added include
 #include "DistanceMetric.h"
 #include "LinkageMethod.h"
 #include <string>
+
+// [[Rcpp::export]]
+Rcpp::List toyListExample() {
+  // Create a simple list with two elements: x = 42, y = "hello"
+  return Rcpp::List::create(
+    Rcpp::_["x"] = 42,
+    Rcpp::_["y"] = "hello"
+  );
+}
 
 //' @name RichCluster
 //'
@@ -41,14 +51,16 @@
 //'
 //' @export
 // [[Rcpp::export]]
-Rcpp::List RichCluster(std::string distanceMetric, double distanceCutoff,
+Rcpp::List RunRichCluster(std::string distanceMetric, double distanceCutoff,
                        std::string linkageMethod, double linkageCutoff,
                        Rcpp::CharacterVector termNameColumn,
                        Rcpp::CharacterVector geneIDColumn) {
 
   DistanceMetric dm_obj(distanceMetric, distanceCutoff); // Renamed DM to dm_obj for clarity
   LinkageMethod lm_obj(linkageMethod, linkageCutoff);   // Create LinkageMethod with correct constructor
-  RichCluster CM(termNameColumn, geneIDColumn, dm_obj, lm_obj); // Corrected constructor call
+  
+  // Now “RichCluster” unambiguously refers to the class, not the function.
+  RichCluster CM(termNameColumn, geneIDColumn, dm_obj, lm_obj);
 
   CM.computeDistances(); // Replaced calculateDistanceScores
 

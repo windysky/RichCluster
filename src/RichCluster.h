@@ -9,6 +9,8 @@
 #include "AdjacencyList.h"
 #include "LinkageMethod.h"
 #include "ClusterList.h"
+#include <vector>
+#include <unordered_set>
 
 // class where the high level RichCluster algorithm is executed
 class RichCluster {
